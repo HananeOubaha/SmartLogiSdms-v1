@@ -1,12 +1,15 @@
 package com.smartlogi.sdms.controller;
 
-import com.smartlogi.sdms.dto.ZoneDto;
+import com.smartlogi.sdms.DTO.ZoneDto;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import com.smartlogi.sdms.service.ZoneService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
@@ -22,6 +25,9 @@ public class ZoneController {
     private final ZoneService zoneService;
 
     // POST /api/zones
+    @Operation(summary = "Crée une nouvelle zone de livraison") // <-- Opération
+    @ApiResponse(responseCode = "201", description = "Zone créée avec succès")
+    @ApiResponse(responseCode = "400", description = "Données d'entrée invalides (validation)")
     @PostMapping
     public ResponseEntity<ZoneDto> createZone(@Valid @RequestBody ZoneDto zoneDto) {
         ZoneDto createdZone = zoneService.createZone(zoneDto);
@@ -29,6 +35,8 @@ public class ZoneController {
     }
 
     // GET /api/zones
+    @Operation(summary = "Récupère toutes les zones")
+    @ApiResponse(responseCode = "200", description = "Liste des zones retournée")
     @GetMapping
     public ResponseEntity<List<ZoneDto>> getAllZones() {
         List<ZoneDto> zones = zoneService.getAllZones();
@@ -36,6 +44,9 @@ public class ZoneController {
     }
 
     // GET /api/zones/{id}
+    @Operation(summary = "Récupère une zone par son ID")
+    @ApiResponse(responseCode = "200", description = "Zone trouvée")
+    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @GetMapping("/{id}")
     public ResponseEntity<ZoneDto> getZoneById(@PathVariable Long id) {
         ZoneDto zoneDto = zoneService.getZoneById(id);
@@ -43,6 +54,9 @@ public class ZoneController {
     }
 
     // PUT /api/zones/{id}
+    @Operation(summary = "Met à jour une zone existante")
+    @ApiResponse(responseCode = "200", description = "Zone mise à jour avec succès")
+    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @PutMapping("/{id}")
     public ResponseEntity<ZoneDto> updateZone(@PathVariable Long id, @Valid @RequestBody ZoneDto zoneDto) {
         ZoneDto updatedZone = zoneService.updateZone(id, zoneDto);
@@ -50,6 +64,9 @@ public class ZoneController {
     }
 
     // DELETE /api/zones/{id}
+    @Operation(summary = "Supprime une zone par son ID")
+    @ApiResponse(responseCode = "204", description = "Zone supprimée (No Content)")
+    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteZone(@PathVariable Long id) {
         zoneService.deleteZone(id);

@@ -1,6 +1,6 @@
 package com.smartlogi.sdms.service;
 
-import com.smartlogi.sdms.dto.ZoneDto;
+import com.smartlogi.sdms.DTO.ZoneDto;
 import com.smartlogi.sdms.mapper.ZoneMapper;
 import com.smartlogi.sdms.model.Zone;
 import com.smartlogi.sdms.repository.ZoneRepository;

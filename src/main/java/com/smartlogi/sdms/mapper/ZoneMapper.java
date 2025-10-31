@@ -1,6 +1,6 @@
 package com.smartlogi.sdms.mapper;
 
-import com.smartlogi.sdms.dto.ZoneDto;
+import com.smartlogi.sdms.DTO.ZoneDto;
 import com.smartlogi.sdms.model.Zone;
 import org.mapstruct.Mapper;
 
