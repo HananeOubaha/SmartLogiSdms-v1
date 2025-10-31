@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: smartlogi-sdms
+
+  # Configuration PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartlogi1_db
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  # Configuration JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  # Configuration Liquibase
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
