@@ -5,8 +5,10 @@ import com.smartlogi.sdms.mapper.ZoneMapper;
 import com.smartlogi.sdms.model.Zone;
 import com.smartlogi.sdms.repository.ZoneRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +50,7 @@ public class ZoneService {
      * @return Le DTO de la zone.
      * @throws EntityNotFoundException si la zone n'est pas trouvée.
      */
-    public ZoneDto getZoneById(Long id) {
+    public ZoneDto getZoneById(UUID id) {
         Zone zone = zoneRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Zone non trouvée avec l'ID: " + id));
         return zoneMapper.toDto(zone);
@@ -61,7 +63,7 @@ public class ZoneService {
      * @return Le DTO de la zone mise à jour.
      * @throws EntityNotFoundException si la zone n'est pas trouvée.
      */
-    public ZoneDto updateZone(Long id, ZoneDto zoneDto) {
+    public ZoneDto updateZone(UUID id, ZoneDto zoneDto) {
         // 1. Vérifie si l'entité existe
         Zone existingZone = zoneRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Zone non trouvée avec l'ID: " + id));
@@ -81,10 +83,15 @@ public class ZoneService {
      * @param id L'ID de la zone à supprimer.
      * @throws EntityNotFoundException si la zone n'est pas trouvée.
      */
-    public void deleteZone(Long id) {
+    public void deleteZone(UUID id) {
         if (!zoneRepository.existsById(id)) {
             throw new EntityNotFoundException("Zone non trouvée avec l'ID: " + id);
         }
         zoneRepository.deleteById(id);
+    }
+
+    public Zone getZoneEntityById(@NotNull(message = "L'ID de la zone est obligatoire") UUID zoneId) {
+        return zoneRepository.findById(zoneId)
+                .orElseThrow(() -> new EntityNotFoundException("Zone non trouvée avec l'ID: " + zoneId));
     }
 }

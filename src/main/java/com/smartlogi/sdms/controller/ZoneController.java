@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import java.util.UUID;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public class ZoneController {
     @ApiResponse(responseCode = "200", description = "Zone trouvée")
     @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @GetMapping("/{id}")
-    public ResponseEntity<ZoneDto> getZoneById(@PathVariable Long id) {
+    public ResponseEntity<ZoneDto> getZoneById(@PathVariable UUID id) {
         ZoneDto zoneDto = zoneService.getZoneById(id);
         return ResponseEntity.ok(zoneDto);
     }
@@ -58,7 +58,7 @@ public class ZoneController {
     @ApiResponse(responseCode = "200", description = "Zone mise à jour avec succès")
     @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @PutMapping("/{id}")
-    public ResponseEntity<ZoneDto> updateZone(@PathVariable Long id, @Valid @RequestBody ZoneDto zoneDto) {
+    public ResponseEntity<ZoneDto> updateZone(@PathVariable UUID id, @Valid @RequestBody ZoneDto zoneDto) {
         ZoneDto updatedZone = zoneService.updateZone(id, zoneDto);
         return ResponseEntity.ok(updatedZone);
     }
@@ -68,7 +68,7 @@ public class ZoneController {
     @ApiResponse(responseCode = "204", description = "Zone supprimée (No Content)")
     @ApiResponse(responseCode = "404", description = "Zone non trouvée")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteZone(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteZone(@PathVariable UUID id) {
         zoneService.deleteZone(id);
         return ResponseEntity.noContent().build();
     }

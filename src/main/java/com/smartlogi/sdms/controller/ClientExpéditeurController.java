@@ -1,6 +1,6 @@
 package com.smartlogi.sdms.controller;
 
-import com.smartlogi.sdms.dto.ClientExpéditeurDto;
+import com.smartlogi.sdms.DTO.ClientExpéditeurDto;
 import com.smartlogi.sdms.service.ClientExpéditeurService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/clients-expediteurs")
@@ -46,7 +47,7 @@ public class ClientExpéditeurController {
     @ApiResponse(responseCode = "200", description = "Client trouvé")
     @ApiResponse(responseCode = "404", description = "Client non trouvé")
     @GetMapping("/{id}")
-    public ResponseEntity<ClientExpéditeurDto> getClientById(@PathVariable Long id) {
+    public ResponseEntity<ClientExpéditeurDto> getClientById(@PathVariable UUID id) {
         ClientExpéditeurDto clientDto = clientExpéditeurService.getClientById(id);
         return ResponseEntity.ok(clientDto);
     }
@@ -56,7 +57,7 @@ public class ClientExpéditeurController {
     @ApiResponse(responseCode = "200", description = "Client mis à jour avec succès")
     @ApiResponse(responseCode = "404", description = "Client non trouvé")
     @PutMapping("/{id}")
-    public ResponseEntity<ClientExpéditeurDto> updateClient(@PathVariable Long id, @Valid @RequestBody ClientExpéditeurDto clientDto) {
+    public ResponseEntity<ClientExpéditeurDto> updateClient(@PathVariable UUID id, @Valid @RequestBody ClientExpéditeurDto clientDto) {
         ClientExpéditeurDto updatedClient = clientExpéditeurService.updateClient(id, clientDto);
         return ResponseEntity.ok(updatedClient);
     }
@@ -66,7 +67,7 @@ public class ClientExpéditeurController {
     @ApiResponse(responseCode = "204", description = "Client supprimé (No Content)")
     @ApiResponse(responseCode = "404", description = "Client non trouvé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteClient(@PathVariable UUID id) {
         clientExpéditeurService.deleteClient(id);
         return ResponseEntity.noContent().build();
     }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,20 +34,20 @@ public class DestinataireService {
     }
 
     // READ BY ID
-    public DestinataireDto getDestinataireById(Long id) {
+    public DestinataireDto getDestinataireById(UUID id) {
         Destinataire destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
         return destinataireMapper.toDto(destinataire);
     }
 
     // FETCH ENTITY (pour usage interne, ex: dans ColisService)
-    public Destinataire getDestinataireEntityById(Long id) {
+    public Destinataire getDestinataireEntityById(UUID id) {
         return destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
     }
 
     // UPDATE
-    public DestinataireDto updateDestinataire(Long id, DestinataireDto destinataireDto) {
+    public DestinataireDto updateDestinataire(UUID id, DestinataireDto destinataireDto) {
         Destinataire existingDestinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
 
@@ -62,7 +63,7 @@ public class DestinataireService {
     }
 
     // DELETE
-    public void deleteDestinataire(Long id) {
+    public void deleteDestinataire(UUID id) {
         if (!destinataireRepository.existsById(id)) {
             throw new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id);
         }

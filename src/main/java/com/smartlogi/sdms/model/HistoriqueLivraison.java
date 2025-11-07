@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.GenericGenerator; // Nécessaire pour la stratégie UUID
+
 import java.time.LocalDateTime;
+import java.util.UUID; // <-- Import nécessaire
 
 @Entity
 @Table(name = "historique_livraison")
@@ -14,8 +17,12 @@ import java.time.LocalDateTime;
 public class HistoriqueLivraison {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    // Génère l'ID en utilisant la stratégie UUID2 d'Hibernate
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    // Mappe l'objet Java UUID vers la colonne VARCHAR(36) de la base de données
+    @Column(name = "id", columnDefinition = "VARCHAR(36)")
+    private UUID id; // <-- CORRECTION: Changé de Long à UUID
 
     // Colonne pour le statut du colis (ex: EN_PREPARATION, EN_TRANSIT, LIVRE)
     @Column(name = "statut", nullable = false, length = 50)
@@ -33,6 +40,7 @@ public class HistoriqueLivraison {
 
     // HistoriqueLivraison est l'entité Many (plusieurs historiques pour un colis)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_colis", nullable = false)
+    // CORRECTION: Assure que la FK utilise le type VARCHAR(36) pour l'ID du Colis
+    @JoinColumn(name = "colis_id", referencedColumnName = "id", nullable = false, columnDefinition = "VARCHAR(36)")
     private Colis colis;
 }

@@ -1,6 +1,6 @@
 package com.smartlogi.sdms.service;
 
-import com.smartlogi.sdms.dto.ClientExpéditeurDto;
+import com.smartlogi.sdms.DTO.ClientExpéditeurDto;
 import com.smartlogi.sdms.mapper.ClientExpéditeurMapper;
 import com.smartlogi.sdms.model.ClientExpéditeur;
 import com.smartlogi.sdms.repository.ClientExpéditeurRepository;
@@ -8,6 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,21 +41,21 @@ public class ClientExpéditeurService {
     }
 
     // READ BY ID
-    public ClientExpéditeurDto getClientById(Long id) {
+    public ClientExpéditeurDto getClientById(UUID id){
         ClientExpéditeur client = clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
         return clientExpéditeurMapper.toDto(client);
     }
 
     // FETCH ENTITY (pour usage interne, ex: dans ColisService)
-    public ClientExpéditeur getClientEntityById(Long id) {
+    public ClientExpéditeur getClientEntityById(UUID id) {
         return clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
     }
 
 
     // UPDATE
-    public ClientExpéditeurDto updateClient(Long id, ClientExpéditeurDto clientDto) {
+    public ClientExpéditeurDto updateClient(UUID id, ClientExpéditeurDto clientDto) {
         ClientExpéditeur existingClient = clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
 
@@ -76,7 +77,7 @@ public class ClientExpéditeurService {
     }
 
     // DELETE
-    public void deleteClient(Long id) {
+    public void deleteClient(UUID id) {
         if (!clientExpéditeurRepository.existsById(id)) {
             throw new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id);
         }

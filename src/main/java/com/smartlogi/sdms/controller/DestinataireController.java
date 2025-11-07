@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.UUID;
 import java.util.List;
 
 @RestController
@@ -45,7 +45,7 @@ public class DestinataireController {
     @ApiResponse(responseCode = "200", description = "Destinataire trouvé")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @GetMapping("/{id}")
-    public ResponseEntity<DestinataireDto> getDestinataireById(@PathVariable Long id) {
+    public ResponseEntity<DestinataireDto> getDestinataireById(@PathVariable UUID id) {
         DestinataireDto destinataireDto = destinataireService.getDestinataireById(id);
         return ResponseEntity.ok(destinataireDto);
     }
@@ -55,7 +55,7 @@ public class DestinataireController {
     @ApiResponse(responseCode = "200", description = "Destinataire mis à jour avec succès")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @PutMapping("/{id}")
-    public ResponseEntity<DestinataireDto> updateDestinataire(@PathVariable Long id, @Valid @RequestBody DestinataireDto destinataireDto) {
+    public ResponseEntity<DestinataireDto> updateDestinataire(@PathVariable UUID id, @Valid @RequestBody DestinataireDto destinataireDto) {
         DestinataireDto updatedDestinataire = destinataireService.updateDestinataire(id, destinataireDto);
         return ResponseEntity.ok(updatedDestinataire);
     }
@@ -65,7 +65,7 @@ public class DestinataireController {
     @ApiResponse(responseCode = "204", description = "Destinataire supprimé (No Content)")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDestinataire(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDestinataire(@PathVariable UUID id) {
         destinataireService.deleteDestinataire(id);
         return ResponseEntity.noContent().build();
     }

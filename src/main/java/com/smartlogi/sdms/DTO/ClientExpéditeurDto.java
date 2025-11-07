@@ -1,4 +1,4 @@
-package com.smartlogi.sdms.dto;
+package com.smartlogi.sdms.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -8,13 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID; // <-- AJOUTER CET IMPORT
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "DTO pour l'expéditeur : création, consultation et mise à jour.")
 public class ClientExpéditeurDto {
 
-    private Long id;
+    // CORRECTION ICI : Changé de Long à UUID
+    @Schema(description = "Identifiant unique de l'expéditeur (lecture seule)", example = "a1b2c3d4-e5f6-7g8h-...")
+    private UUID id;
 
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")

@@ -8,13 +8,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID; // <-- AJOUTER CET IMPORT
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "DTO pour le destinataire : création, consultation et mise à jour.")
 public class DestinataireDto {
 
-    private Long id;
+    // CORRECTION ICI : Changé de Long à UUID
+    @Schema(description = "Identifiant unique du destinataire (lecture seule)", example = "a1b2c3d4-e5f6-7g8h-...")
+    private UUID id;
 
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")
@@ -28,7 +32,7 @@ public class DestinataireDto {
     @Email(message = "Format d'email invalide")
     @Size(max = 150, message = "L'email ne doit pas dépasser 150 caractères")
     @Schema(example = "samira.hassani@domicile.com")
-    private String email; // N'est pas @NotBlank car parfois non fourni
+    private String email;
 
     @NotBlank(message = "Le téléphone est obligatoire")
     @Size(max = 20, message = "Le téléphone ne doit pas dépasser 20 caractères")
