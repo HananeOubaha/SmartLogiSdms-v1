@@ -83,4 +83,12 @@ public class ClientExpéditeurService {
         }
         clientExpéditeurRepository.deleteById(id);
     }
+
+    public List<ClientExpéditeurDto> afficherClient(String adress){
+       List<ClientExpéditeur> clients= clientExpéditeurRepository.findAll();
+      return clients.stream()
+               .filter(client -> adress.equals(client.getAdresse()))
+               .map(client-> clientExpéditeurMapper.toDto(client))
+               .toList();
+    }
 }

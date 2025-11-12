@@ -15,7 +15,7 @@ import java.util.UUID; // Import nécessaire pour UUID
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientExpéditeur {
-
+//testing
     @Id
     // Génère l'ID en utilisant la stratégie UUID2 d'Hibernate
     @GeneratedValue(generator = "uuid2")
