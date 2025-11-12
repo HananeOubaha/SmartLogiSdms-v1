@@ -62,7 +62,7 @@ Tous les identifiants sont gérés par des UUID (Universally Unique Identifiers)
 
 ## 🖼️ Diagramme de Classes UML
 
-![Diagramme de Classes UML de l'application](src/SmartLogi SDMS v1.png)
+![SmartLogi SDMS v1.png](src/SmartLogi%20SDMS%20v1.png)
 `![Diagramme de Classes UML de l'application](diagramme_classes.png)`
 
 
