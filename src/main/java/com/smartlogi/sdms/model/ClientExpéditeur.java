@@ -43,4 +43,6 @@ public class ClientExpéditeur {
     // Note: Assurez-vous que l'entité Colis utilise aussi UUID pour ses clés étrangères.
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Colis> colisEnvoyes;
+
+    //hello
 }
