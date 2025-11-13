@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +22,7 @@ public class DestinataireService {
     // CREATE
     public DestinataireDto createDestinataire(DestinataireDto destinataireDto) {
         Destinataire destinataire = destinataireMapper.toEntity(destinataireDto);
+        // L'ID String est généré par @PrePersist dans l'Entité
         Destinataire savedDestinataire = destinataireRepository.save(destinataire);
         return destinataireMapper.toDto(savedDestinataire);
     }
@@ -34,20 +35,23 @@ public class DestinataireService {
     }
 
     // READ BY ID
-    public DestinataireDto getDestinataireById(UUID id) {
+    // CORRECTION : id doit être String
+    public DestinataireDto getDestinataireById(String id) {
         Destinataire destinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
         return destinataireMapper.toDto(destinataire);
     }
 
     // FETCH ENTITY (pour usage interne, ex: dans ColisService)
-    public Destinataire getDestinataireEntityById(UUID id) {
+    // CORRECTION : id doit être String
+    public Destinataire getDestinataireEntityById(String id) {
         return destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
     }
 
     // UPDATE
-    public DestinataireDto updateDestinataire(UUID id, DestinataireDto destinataireDto) {
+    // CORRECTION : id doit être String
+    public DestinataireDto updateDestinataire(String id, DestinataireDto destinataireDto) {
         Destinataire existingDestinataire = destinataireRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id));
 
@@ -63,7 +67,8 @@ public class DestinataireService {
     }
 
     // DELETE
-    public void deleteDestinataire(UUID id) {
+    // CORRECTION : id doit être String
+    public void deleteDestinataire(String id) {
         if (!destinataireRepository.existsById(id)) {
             throw new EntityNotFoundException("Destinataire non trouvé avec l'ID: " + id);
         }

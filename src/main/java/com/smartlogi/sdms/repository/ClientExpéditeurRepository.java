@@ -3,12 +3,17 @@ package com.smartlogi.sdms.repository;
 import com.smartlogi.sdms.model.ClientExpéditeur;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 import java.util.Optional;
 
 @Repository
-public interface ClientExpéditeurRepository extends JpaRepository<ClientExpéditeur, UUID> {
+// CORRECTION CLÉ : Remplacer UUID par String
+public interface ClientExpéditeurRepository extends JpaRepository<ClientExpéditeur, String> {
 
-    // Ajout d'une méthode pour vérifier l'unicité par email, très utile.
+    /**
+     * Recherche un client expéditeur par son email (utilisé pour la vérification d'unicité).
+     * @param email L'email à rechercher.
+     * @return ClientExpéditeur s'il existe.
+     */
     Optional<ClientExpéditeur> findByEmail(String email);
 }

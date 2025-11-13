@@ -7,7 +7,7 @@ import com.smartlogi.sdms.repository.LivreurRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +22,7 @@ public class LivreurService {
     // CREATE
     public LivreurDto createLivreur(LivreurDto livreurDto) {
         Livreur livreur = livreurMapper.toEntity(livreurDto);
+        // L'ID String est généré par @PrePersist dans l'Entité
         Livreur savedLivreur = livreurRepository.save(livreur);
         return livreurMapper.toDto(savedLivreur);
     }
@@ -34,20 +35,23 @@ public class LivreurService {
     }
 
     // READ BY ID
-    public LivreurDto getLivreurById(UUID id) {
+    // CORRECTION : id doit être String
+    public LivreurDto getLivreurById(String id) {
         Livreur livreur = livreurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Livreur non trouvé avec l'ID: " + id));
         return livreurMapper.toDto(livreur);
     }
 
     // FETCH ENTITY (pour usage interne, ex: dans ColisService)
-    public Livreur getLivreurEntityById(UUID id) {
+    // CORRECTION : id doit être String
+    public Livreur getLivreurEntityById(String id) {
         return livreurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Livreur non trouvé avec l'ID: " + id));
     }
 
     // UPDATE
-    public LivreurDto updateLivreur(UUID id, LivreurDto livreurDto) {
+    // CORRECTION : id doit être String
+    public LivreurDto updateLivreur(String id, LivreurDto livreurDto) {
         Livreur existingLivreur = livreurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Livreur non trouvé avec l'ID: " + id));
 
@@ -63,7 +67,8 @@ public class LivreurService {
     }
 
     // DELETE
-    public void deleteLivreur(UUID id) {
+    // CORRECTION : id doit être String
+    public void deleteLivreur(String id) {
         if (!livreurRepository.existsById(id)) {
             throw new EntityNotFoundException("Livreur non trouvé avec l'ID: " + id);
         }

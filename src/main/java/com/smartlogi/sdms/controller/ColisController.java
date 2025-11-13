@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 
 @RestController
 @RequestMapping("/api/colis")
@@ -25,7 +25,7 @@ public class ColisController {
     private final ColisService colisService;
 
     // ============================================
-    // CRUD de Base / Création (User Story Client Expéditeur)
+    // CRUD de Base / Création
     // ============================================
 
     // POST /api/colis
@@ -49,7 +49,8 @@ public class ColisController {
     @Operation(summary = "Récupère un colis par son ID (pour le suivi)")
     @ApiResponse(responseCode = "404", description = "Colis non trouvé")
     @GetMapping("/{id}")
-    public ResponseEntity<ColisDto> getColisById(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<ColisDto> getColisById(@PathVariable String id) {
         return ResponseEntity.ok(colisService.getColisById(id));
     }
 
@@ -57,7 +58,8 @@ public class ColisController {
     @Operation(summary = "Supprime un colis (Gestionnaire)")
     @ApiResponse(responseCode = "204", description = "Colis supprimé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteColis(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<Void> deleteColis(@PathVariable String id) {
         colisService.deleteColis(id);
         return ResponseEntity.noContent().build();
     }
@@ -71,9 +73,10 @@ public class ColisController {
     @ApiResponse(responseCode = "200", description = "Affectation réussie")
     @ApiResponse(responseCode = "404", description = "Colis ou Livreur ID non trouvé")
     @PutMapping("/assigner/{colisId}")
+    // CORRECTION : colisId et livreurId doivent être String
     public ResponseEntity<ColisDto> assignerLivreur(
-            @PathVariable UUID colisId,
-            @RequestParam UUID livreurId) {
+            @PathVariable String colisId,
+            @RequestParam String livreurId) {
 
         ColisDto updatedColis = colisService.assignerLivreur(colisId, livreurId);
         return ResponseEntity.ok(updatedColis);
@@ -83,12 +86,13 @@ public class ColisController {
     @Operation(summary = "Met à jour le statut du colis (COLLECTE, LIVRE, etc.)")
     @ApiResponse(responseCode = "200", description = "Statut mis à jour et historique enregistré")
     @PutMapping("/statut/{colisId}")
+    // CORRECTION : colisId doit être String, et le statut doit prendre la valeur du paramètre
     public ResponseEntity<ColisDto> updateStatut(
-            @PathVariable UUID colisId,
+            @PathVariable String colisId,
             @RequestParam StatutColis statut,
             @RequestParam String commentaire) {
 
-        ColisDto updatedColis = colisService.updateStatut(colisId, StatutColis.CREE, commentaire);
+        ColisDto updatedColis = colisService.updateStatut(colisId, statut, commentaire);
         return ResponseEntity.ok(updatedColis);
     }
 }

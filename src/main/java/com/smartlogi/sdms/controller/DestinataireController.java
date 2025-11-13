@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
+
 import java.util.List;
 
 @RestController
@@ -45,7 +46,8 @@ public class DestinataireController {
     @ApiResponse(responseCode = "200", description = "Destinataire trouvé")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @GetMapping("/{id}")
-    public ResponseEntity<DestinataireDto> getDestinataireById(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<DestinataireDto> getDestinataireById(@PathVariable String id) {
         DestinataireDto destinataireDto = destinataireService.getDestinataireById(id);
         return ResponseEntity.ok(destinataireDto);
     }
@@ -55,7 +57,8 @@ public class DestinataireController {
     @ApiResponse(responseCode = "200", description = "Destinataire mis à jour avec succès")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @PutMapping("/{id}")
-    public ResponseEntity<DestinataireDto> updateDestinataire(@PathVariable UUID id, @Valid @RequestBody DestinataireDto destinataireDto) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<DestinataireDto> updateDestinataire(@PathVariable String id, @Valid @RequestBody DestinataireDto destinataireDto) {
         DestinataireDto updatedDestinataire = destinataireService.updateDestinataire(id, destinataireDto);
         return ResponseEntity.ok(updatedDestinataire);
     }
@@ -65,7 +68,8 @@ public class DestinataireController {
     @ApiResponse(responseCode = "204", description = "Destinataire supprimé (No Content)")
     @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDestinataire(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<Void> deleteDestinataire(@PathVariable String id) {
         destinataireService.deleteDestinataire(id);
         return ResponseEntity.noContent().build();
     }
