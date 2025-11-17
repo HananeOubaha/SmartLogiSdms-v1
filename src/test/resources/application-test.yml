@@ -1,0 +1,22 @@
+spring:
+  # 1. Configuration de la Base de Données H2 en mémoire
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+
+  # 2. Configuration JPA/Hibernate pour les tests
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      # CRITIQUE : Hibernate recrée le schéma à chaque fois pour la propreté.
+      ddl-auto: create-drop
+    show-sql: false # Désactivez le SQL affiché pendant les tests si vous le souhaitez
+
+  # 3. Configuration Liquibase pour les tests
+  liquibase:
+    # Liquibase DOIT être désactivé si ddl-auto: create-drop est utilisé,
+    # car Hibernate créera les tables pour nous sur H2.
+    enabled: false
+
