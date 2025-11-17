@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 import java.util.List;
 
 @Data
@@ -33,19 +33,19 @@ public class ColisCreationDto {
     @Schema(description = "Priorité du colis (ex: URGENTE, HAUTE)", example = "NORMALE")
     private String priorite;
 
-    // --- UUIDs des Entités Parentes ---
+    // --- CORRECTION: Changé de UUID à String ---
 
     @NotNull(message = "L'ID du client expéditeur est obligatoire")
     @Schema(description = "ID du Client Expéditeur (UUID)", required = true)
-    private UUID clientExpediteurId;
+    private String clientExpediteurId; // <-- CHANGÉ DE UUID À STRING
 
     @NotNull(message = "L'ID du destinataire est obligatoire")
     @Schema(description = "ID du Destinataire (UUID)", required = true)
-    private UUID destinataireId;
+    private String destinataireId; // <-- CHANGÉ DE UUID À STRING
 
     @NotNull(message = "L'ID de la zone est obligatoire")
     @Schema(description = "ID de la Zone de destination (UUID)", required = true)
-    private UUID zoneId;
+    private String zoneId; // <-- CHANGÉ DE UUID À STRING
 
     // Pour simplifier cette étape, nous n'incluons pas les produits dans le DTO de création initial.
 }

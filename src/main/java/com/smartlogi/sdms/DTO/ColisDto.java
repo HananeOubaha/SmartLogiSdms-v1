@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
 
 @Data
 @NoArgsConstructor
@@ -14,7 +14,8 @@ import java.util.UUID;
 @Schema(description = "DTO de réponse pour afficher le colis et son état.")
 public class ColisDto {
 
-    private UUID id;
+    // CORRECTION ICI : Changé de UUID à String
+    private String id;
     private String description;
     private Double poids;
     private String statut; // Type String pour afficher l'Enum
@@ -24,7 +25,7 @@ public class ColisDto {
 
     // Simplification des IDs des relations pour la réponse DTO
     @Schema(description = "ID du Livreur assigné (peut être null)")
-    private UUID livreurId;
+    private String livreurId; // <-- CHANGÉ DE UUID À STRING
 
     @Schema(description = "Nom complet de l'Expéditeur")
     private String clientExpediteurNomComplet;

@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.GenericGenerator; // Import nécessaire
+// Suppression de l'import org.hibernate.annotations.GenericGenerator
 import java.util.List;
-import java.util.UUID; // Import nécessaire
+// Suppression de l'import java.util.UUID
 
 @Entity
 @Table(name = "destinataire")
@@ -16,12 +16,9 @@ import java.util.UUID; // Import nécessaire
 public class Destinataire {
 
     @Id
-    // Génère l'ID en utilisant la stratégie UUID2 d'Hibernate
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    // Mappe l'objet Java UUID vers la colonne VARCHAR(36) de la base de données
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
-    private UUID id; // <-- CORRECTION: Changé de Long à UUID
+    private String id; // <-- CORRECTION: Changé de UUID à String
 
     @Column(name = "nom", nullable = false, length = 100)
     private String nom;
@@ -42,4 +39,15 @@ public class Destinataire {
     // MappedBy doit pointer vers le champ Destinataire dans l'entité Colis.
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Colis> colisReçus;
+
+    /**
+     * Logique pour générer l'ID UUID sous forme de String AVANT l'insertion.
+     */
+    @PrePersist
+    protected void onPrePersist() {
+        if (this.id == null) {
+            // Génère un UUID et le stocke comme String
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 }

@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID; // <-- AJOUTER CET IMPORT
+// Suppression de l'import java.util.UUID
 
 @Data
 @NoArgsConstructor
@@ -16,9 +16,9 @@ import java.util.UUID; // <-- AJOUTER CET IMPORT
 @Schema(description = "DTO pour l'expéditeur : création, consultation et mise à jour.")
 public class ClientExpéditeurDto {
 
-    // CORRECTION ICI : Changé de Long à UUID
+    // CORRECTION ICI : Changé de UUID à String
     @Schema(description = "Identifiant unique de l'expéditeur (lecture seule)", example = "a1b2c3d4-e5f6-7g8h-...")
-    private UUID id;
+    private String id; // <-- CHANGÉ DE UUID À STRING
 
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")

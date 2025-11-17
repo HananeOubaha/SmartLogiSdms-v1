@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID
+
 import java.util.List;
 
 @RestController
@@ -45,7 +46,8 @@ public class LivreurController {
     @ApiResponse(responseCode = "200", description = "Livreur trouvé")
     @ApiResponse(responseCode = "404", description = "Livreur non trouvé")
     @GetMapping("/{id}")
-    public ResponseEntity<LivreurDto> getLivreurById(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<LivreurDto> getLivreurById(@PathVariable String id) {
         LivreurDto livreurDto = livreurService.getLivreurById(id);
         return ResponseEntity.ok(livreurDto);
     }
@@ -55,7 +57,8 @@ public class LivreurController {
     @ApiResponse(responseCode = "200", description = "Livreur mis à jour avec succès")
     @ApiResponse(responseCode = "404", description = "Livreur non trouvé")
     @PutMapping("/{id}")
-    public ResponseEntity<LivreurDto> updateLivreur(@PathVariable UUID id, @Valid @RequestBody LivreurDto livreurDto) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<LivreurDto> updateLivreur(@PathVariable String id, @Valid @RequestBody LivreurDto livreurDto) {
         LivreurDto updatedLivreur = livreurService.updateLivreur(id, livreurDto);
         return ResponseEntity.ok(updatedLivreur);
     }
@@ -65,7 +68,8 @@ public class LivreurController {
     @ApiResponse(responseCode = "204", description = "Livreur supprimé (No Content)")
     @ApiResponse(responseCode = "404", description = "Livreur non trouvé")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLivreur(@PathVariable UUID id) {
+    // CORRECTION : id doit être String
+    public ResponseEntity<Void> deleteLivreur(@PathVariable String id) {
         livreurService.deleteLivreur(id);
         return ResponseEntity.noContent().build();
     }

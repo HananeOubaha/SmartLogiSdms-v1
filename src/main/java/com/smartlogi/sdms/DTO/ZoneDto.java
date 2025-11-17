@@ -7,17 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.UUID; // <-- AJOUTER CET IMPORT
+// Suppression de l'import java.util.UUID
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "DTO pour la gestion des zones de livraison.") // Ajout de la description pour la clarté Swagger
+@Schema(description = "DTO pour la gestion des zones de livraison.")
 public class ZoneDto {
 
-    // CORRECTION ICI : Changé de Long à UUID
+    // CORRECTION ICI : Changé de UUID à String
     @Schema(description = "Identifiant unique de la zone (lecture seule)", example = "a1b2c3d4-e5f6-7g8h-...")
-    private UUID id;
+    private String id; // <-- CHANGÉ DE UUID À STRING
 
     @NotBlank(message = "Le nom de la zone est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")

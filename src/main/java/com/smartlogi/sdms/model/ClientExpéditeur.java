@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import org.hibernate.annotations.GenericGenerator; // Import nécessaire pour GenericGenerator
-
+// Suppression de l'import org.hibernate.annotations.GenericGenerator
 import java.util.List;
-import java.util.UUID; // Import nécessaire pour UUID
+// Suppression de l'import java.util.UUID
 
 @Entity
 @Table(name = "client_expediteur")
@@ -15,14 +14,12 @@ import java.util.UUID; // Import nécessaire pour UUID
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientExpéditeur {
-
+    //testing
     @Id
-    // Génère l'ID en utilisant la stratégie UUID2 d'Hibernate
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    // Mappe l'objet Java UUID vers la colonne VARCHAR(36) de la base de données
+    @GeneratedValue(strategy = GenerationType.UUID)
+    // Mappe l'objet Java String vers la colonne VARCHAR(36) de la base de données
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
-    private UUID id; // Changé de Long à UUID
+    private String id; // <-- CORRECTION: Changé de UUID à String
 
     @Column(name = "nom", nullable = false, length = 100)
     private String nom;
@@ -40,7 +37,19 @@ public class ClientExpéditeur {
     private String adresse;
 
     // Relation: Un expéditeur peut envoyer plusieurs colis.
-    // Note: Assurez-vous que l'entité Colis utilise aussi UUID pour ses clés étrangères.
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Colis> colisEnvoyes;
+
+    /**
+     * Ajout de la logique de génération UUID (en tant que String)
+     * AVANT la première insertion dans la base de données.
+     */
+    @PrePersist
+    protected void onPrePersist() {
+        if (this.id == null) {
+            // Génère un UUID et le stocke comme String
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
+//hello
 }

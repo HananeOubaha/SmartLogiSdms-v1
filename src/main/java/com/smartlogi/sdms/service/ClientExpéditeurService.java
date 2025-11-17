@@ -8,7 +8,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID car il n'est plus utilisé comme argument
+// Note: Il n'est pas utilisé non plus pour la génération d'ID ici, car le code
+// utilise this.id = java.util.UUID.randomUUID().toString() dans l'Entité via @PrePersist.
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ public class ClientExpéditeurService {
         }
 
         ClientExpéditeur client = clientExpéditeurMapper.toEntity(clientDto);
+        // L'ID String est généré par @PrePersist dans l'Entité
         ClientExpéditeur savedClient = clientExpéditeurRepository.save(client);
         return clientExpéditeurMapper.toDto(savedClient);
     }
@@ -41,21 +44,25 @@ public class ClientExpéditeurService {
     }
 
     // READ BY ID
-    public ClientExpéditeurDto getClientById(UUID id){
+    // CORRECTION : Le paramètre id doit être String
+    public ClientExpéditeurDto getClientById(String id){
         ClientExpéditeur client = clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
         return clientExpéditeurMapper.toDto(client);
     }
 
     // FETCH ENTITY (pour usage interne, ex: dans ColisService)
-    public ClientExpéditeur getClientEntityById(UUID id) {
+    // CORRECTION : Le paramètre id doit être String
+    public ClientExpéditeur getClientEntityById(String id) {
         return clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
     }
 
 
     // UPDATE
-    public ClientExpéditeurDto updateClient(UUID id, ClientExpéditeurDto clientDto) {
+    // CORRECTION : Le paramètre id doit être String
+    public ClientExpéditeurDto updateClient(String id, ClientExpéditeurDto clientDto) {
+        // L'appel findById(id) est maintenant correct car id est un String
         ClientExpéditeur existingClient = clientExpéditeurRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id));
 
@@ -77,10 +84,22 @@ public class ClientExpéditeurService {
     }
 
     // DELETE
-    public void deleteClient(UUID id) {
+    // CORRECTION : Le paramètre id doit être String
+    public void deleteClient(String id) {
+        // L'appel existsById(id) et deleteById(id) sont maintenant corrects
         if (!clientExpéditeurRepository.existsById(id)) {
             throw new EntityNotFoundException("Client expéditeur non trouvé avec l'ID: " + id);
         }
         clientExpéditeurRepository.deleteById(id);
+    }
+
+    // NOUVELLE MÉTHODE (Pour le moment, nous laissons la logique de filtrage inefficace pour ne pas modifier le code métier existant,
+    // mais elle sera revue lors de la tâche de filtration avancée.)
+    public List<ClientExpéditeurDto> afficherClient(String adress){
+        List<ClientExpéditeur> clients = clientExpéditeurRepository.findAll();
+        return clients.stream()
+                .filter(client -> adress.equals(client.getAdresse()))
+                .map(client -> clientExpéditeurMapper.toDto(client))
+                .toList();
     }
 }

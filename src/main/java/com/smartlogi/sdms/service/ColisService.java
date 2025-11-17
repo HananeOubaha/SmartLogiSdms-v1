@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+// Suppression de l'import java.util.UUID car il est remplacé par String
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +32,6 @@ public class ColisService {
     private final LivreurService livreurService;
 
     // --- Méthode de Traçabilité ---
-    // CORRECTION: Retire l'annotation @Transactional car elle est privée et appelée par des méthodes publiques déjà transactionnelles.
     private void enregistrerHistorique(Colis colis, String commentaire) {
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setColis(colis);
@@ -47,11 +46,11 @@ public class ColisService {
     // 1. CRÉATION (Le début du flux)
     // ============================================
 
-    @Transactional // La transaction est nécessaire pour valider les FKs et sauvegarder
+    @Transactional
     public ColisDto createColis(ColisCreationDto creationDto) {
 
-        // 1. Validation de l'existence des IDs UUID (vérifie les FKs)
-        // Les services sont censés avoir été corrigés pour accepter les UUIDs.
+        // 1. Validation de l'existence des IDs String (vérifie les FKs)
+        // Les services sont censés avoir été corrigés pour accepter les String.
         ClientExpéditeur client = clientExpéditeurService.getClientEntityById(creationDto.getClientExpediteurId());
         Destinataire destinataire = destinataireService.getDestinataireEntityById(creationDto.getDestinataireId());
         Zone zone = zoneService.getZoneEntityById(creationDto.getZoneId());
@@ -59,7 +58,7 @@ public class ColisService {
         // 2. Création de l'Entité Colis et mapping
         Colis colis = colisMapper.toEntity(creationDto);
 
-        // Assigner les entités résolues (car MapStruct n'assigne que les IDs dans toEntity)
+        // Assigner les entités résolues
         colis.setClientExpediteur(client);
         colis.setDestinataire(destinataire);
         colis.setZone(zone);
@@ -77,7 +76,8 @@ public class ColisService {
     // 2. AFFICHAGE (READ)
     // ============================================
 
-    public ColisDto getColisById(UUID id) {
+    // CORRECTION : id doit être String
+    public ColisDto getColisById(String id) {
         Colis colis = colisRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + id));
         return colisMapper.toDto(colis);
@@ -92,7 +92,8 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    public ColisDto updateStatut(UUID colisId, StatutColis nouveauStatut, String commentaire) {
+    // CORRECTION : colisId doit être String
+    public ColisDto updateStatut(String colisId, StatutColis nouveauStatut, String commentaire) {
         Colis colis = colisRepository.findById(colisId)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
 
@@ -103,7 +104,7 @@ public class ColisService {
         // Enregistrement de la nouvelle étape de l'historique
         enregistrerHistorique(updatedColis, commentaire);
 
-        // Logique spécifique au workflow: (Exemple)
+        // Logique spécifique au workflow:
         if (nouveauStatut == StatutColis.COLLECTE) {
             // Mettre en place d'autres actions automatiques, si nécessaire.
         }
@@ -116,7 +117,8 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    public ColisDto assignerLivreur(UUID colisId, UUID livreurId) {
+    // CORRECTION : colisId et livreurId doivent être String
+    public ColisDto assignerLivreur(String colisId, String livreurId) {
         Colis colis = colisRepository.findById(colisId)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
 
@@ -140,7 +142,8 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    public void deleteColis(UUID id) {
+    // CORRECTION : id doit être String
+    public void deleteColis(String id) {
         if (!colisRepository.existsById(id)) {
             throw new EntityNotFoundException("Colis non trouvé avec l'ID: " + id);
         }

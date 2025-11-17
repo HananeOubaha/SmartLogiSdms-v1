@@ -62,7 +62,7 @@ Tous les identifiants sont gérés par des UUID (Universally Unique Identifiers)
 
 ## 🖼️ Diagramme de Classes UML
 
-![Diagramme de Classes UML de l'application](src/SmartLogi SDMS v1.png)
+![SmartLogi SDMS v1.png](src/SmartLogi%20SDMS%20v1.png)
 `![Diagramme de Classes UML de l'application](diagramme_classes.png)`
 
 
@@ -95,6 +95,57 @@ Tous les identifiants sont gérés par des UUID (Universally Unique Identifiers)
 * **Documentation Swagger :** `http://localhost:8080/swagger-ui.html`
 
 -----
+
+###  Génération et Finalisation du Rapport JaCoCo
+
+Nous devons générer le rapport XML et HTML final qui prouve que vous avez atteint les **90% de couverture** d'instructions.
+
+**Action 1 : Exécuter la Vérification Finale**
+
+Assurez-vous que vous avez exécuté `mvn clean verify` une dernière fois pour que le fichier `jacoco.exec` soit à jour avec tous les tests que nous avons écrits.
+
+**Action 2 : Générer le Rapport XML (pour Sonar) et HTML**
+
+Bien que `mvn verify` exécute déjà le rapport, si vous souhaitez le générer séparément :
+
+```powershell
+mvn jacoco:report
+```
+-----
+
+## 5\. 🛡️ Stratégie d'Assurance Qualité et Résultats
+
+Cette phase de développement (post-v0.1.0) était entièrement dédiée à la validation de la fiabilité du code existant.
+
+### 5.1. Stratégie de Test Mise en Place
+
+| Type de Test | Outil / Composant | Objectif | Couverture |
+| :--- | :--- | :--- | :--- |
+| **Tests Unitaires (TU)** | JUnit 5, Mockito | Isoler chaque service et contrôleur pour valider la logique métier (CRUD, Gestion d'Email Unique, Logique de Flux Colis) et les cas d'exceptions. | Couverture des Services \> 90% |
+| **Tests Contrôleurs (TU-02)** | MockMvc | Simuler les requêtes HTTP pour vérifier le routing, la validation des DTOs (`@Valid`), et le statut des réponses (`201`, `200`, `400`, `404`). | Couverture des Contrôleurs \> 90% |
+| **Tests d'Intégration (TI)** | @SpringBootTest, MockMvc, H2 | Valider le flux complet du Colis (Création, Affectation, Statut) en interagissant avec les couches Service et la Base de Données H2. | Validation de la Cohérence Globale. |
+
+### 5.2. Indicateurs de Qualité (JaCoCo)
+
+Le taux de couverture de ligne (Line Coverage) est l'indicateur principal pour la validation.
+
+| Indicateur | Objectif | Résultat Obtenu | Statut |
+| :--- | :--- | :--- | :--- |
+| **Couverture de Ligne JaCoCo** | **\> 90%** | **[Résultat final %]** | **✅ ATTEINT / ❌ NON ATTEINT** |
+| **Classes Manquantes** | Max. 5 | **0** | **✅ ATTEINT** |
+
+### 5.3. Audit SonarQube (Synthèse)
+
+*(À compléter après l'exécution du scan SonarQube)*
+
+L'analyse SonarQube a permis d'identifier et de corriger plusieurs anomalies (Issues) et de réduire la dette technique :
+
+* **Dette Technique :** [Ex: X jours réduits à Y jours.]
+* **Bugs & Vulnerabilités :** [Ex: 0 Blocker, 0 Critical.]
+* **Actions de Refactoring :** Correction des problèmes de `ClassCastException` et de `Non-null assertion` dans la couche Service.
+
+-----
+
 
 ## ⏭️ Prochaines Fonctionnalités
 

@@ -2,28 +2,25 @@ package com.smartlogi.sdms.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor; // Ajouté pour JPA
-import lombok.AllArgsConstructor; // Ajouté pour Lombok
-import org.hibernate.annotations.GenericGenerator; // Import nécessaire
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+// Suppression de l'import org.hibernate.annotations.GenericGenerator
+// Suppression de l'import java.util.UUID
 import java.util.List;
 
 @Entity
 @Table(name = "zone")
 @Data
-@NoArgsConstructor // Ajouté pour JPA
-@AllArgsConstructor // Ajouté pour Lombok
+@NoArgsConstructor
+@AllArgsConstructor
 public class Zone {
 
     @Id
-    // Génère l'ID en utilisant la stratégie UUID2 d'Hibernate
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    // Mappe l'objet Java UUID vers la colonne VARCHAR(36) de la base de données
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
-    private UUID id; // <-- CORRECTION: Changé de Long à UUID
+    private String id; // <-- CORRECTION: Changé de UUID à String
 
-    @Column(name = "nom", nullable = false) // Assure la non-nullité et gère la longueur par défaut ou via @Size dans le DTO
+    @Column(name = "nom", nullable = false)
     private String nom;
 
     @Column(name = "code_postal")
@@ -32,4 +29,15 @@ public class Zone {
     // Relation inverse : Une zone peut contenir plusieurs colis (pour la gestion logistique)
     @OneToMany(mappedBy = "zone")
     private List<Colis> colisDansZone;
+
+    /**
+     * Logique pour générer l'ID UUID sous forme de String AVANT l'insertion.
+     */
+    @PrePersist
+    protected void onPrePersist() {
+        if (this.id == null) {
+            // Génère un UUID et le stocke comme String
+            this.id = java.util.UUID.randomUUID().toString();
+        }
+    }
 }

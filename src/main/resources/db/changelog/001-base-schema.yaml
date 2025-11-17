@@ -1,5 +1,8 @@
 databaseChangeLog:
 
+  # ===============================================
+  # 001. CRÉATION DES TABLES PRINCIPALES (PKs)
+  # ===============================================
 
   # 001-1: Table ZONE
   - changeSet:
@@ -11,18 +14,19 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
-                  name: nom_zone
+                  name: nom # Nom de la zone (utilisé dans Zone.java)
                   type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false, unique: true }
               - column:
-                  name: details
-                  type: VARCHAR(500)
+                  name: code_postal
+                  type: VARCHAR(10)
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-2: Table CLIENT_EXPEDITEUR
   - changeSet:
@@ -34,26 +38,29 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: nom
                   type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
+              - column:
+                  name: prenom # <-- CORRECTION: Ajout de prenom
+                  type: VARCHAR(255)
               - column:
                   name: adresse
                   type: VARCHAR(500)
               - column:
                   name: email
                   type: VARCHAR(255)
-                  constraints:
-                    unique: true
+                  constraints: { unique: true }
               - column:
                   name: telephone
                   type: VARCHAR(50)
+              - column:
+                  name: date_creation # <-- CORRECTION: Ajout de date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-3: Table DESTINATAIRE
   - changeSet:
@@ -65,26 +72,28 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: nom
                   type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
+              - column:
+                  name: prenom # <-- CORRECTION: Ajout de prenom
+                  type: VARCHAR(255)
               - column:
                   name: adresse
                   type: VARCHAR(500)
               - column:
                   name: email
                   type: VARCHAR(255)
-                  constraints:
-                    unique: true
               - column:
                   name: telephone
                   type: VARCHAR(50)
+              - column:
+                  name: date_creation # <-- CORRECTION: Ajout de date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-4: Table LIVREUR
   - changeSet:
@@ -96,15 +105,12 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: nom
                   type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
               - column:
                   name: prenom
                   type: VARCHAR(255)
@@ -112,10 +118,15 @@ databaseChangeLog:
                   name: telephone
                   type: VARCHAR(50)
               - column:
+                  name: vehicule
+                  type: VARCHAR(50)
+              - column:
                   name: zone_id
-                  type: VARCHAR(36) # FK type ajusté
-                  constraints:
-                    nullable: false
+                  type: VARCHAR(36)
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-5: Table PRODUIT
   - changeSet:
@@ -127,23 +138,26 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: nom
                   type: VARCHAR(255)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
               - column:
                   name: description
                   type: VARCHAR(500)
               - column:
                   name: poids_unitaire
-                  type: DOUBLE # ou DECIMAL, selon la précision souhaitée
-                  constraints:
-                    nullable: false
+                  type: NUMERIC(10, 2) # Utilisation de NUMERIC pour éviter les erreurs de 'scale'
+                  constraints: { nullable: false }
+              - column:
+                  name: prix
+                  type: NUMERIC(10, 2)
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-6: Table COLIS (Contient les FK vers Client, Destinataire, Livreur, Zone)
   - changeSet:
@@ -155,42 +169,52 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints: { nullable: false }
               - column:
                   name: poids_total
-                  type: DOUBLE
-                  constraints:
-                    nullable: false
+                  type: NUMERIC(10, 2)
+                  constraints: { nullable: false }
               - column:
                   name: statut
-                  type: VARCHAR(50) # Ex: "EN ATTENTE", "EN COURS", "LIVRE"
-                  constraints:
-                    nullable: false
+                  type: VARCHAR(50)
+                  constraints: { nullable: false }
+                  defaultValue: 'CRÉÉ'
               - column:
-                  name: date_creation
-                  type: TIMESTAMP
-                  constraints:
-                    nullable: false
-              # Clés Étrangères (toutes en VARCHAR(36))
+                  name: priorite
+                  type: VARCHAR(50)
+                  defaultValue: 'NORMALE'
+              - column:
+                  name: ville_destination
+                  type: VARCHAR(100)
+                  constraints: { nullable: false }
               - column:
                   name: client_expediteur_id
                   type: VARCHAR(36)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
               - column:
                   name: destinataire_id
                   type: VARCHAR(36)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
               - column:
                   name: livreur_id
-                  type: VARCHAR(36) # Peut être nullable si le colis n'est pas encore assigné
+                  type: VARCHAR(36)
               - column:
                   name: zone_id
-                  type: VARCHAR(36) # Peut être nullable si la zone n'est pas encore déterminée
+                  type: VARCHAR(36)
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  constraints: { nullable: false }
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: date_modification
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-7: Table HISTORIQUE_LIVRAISON
   - changeSet:
@@ -202,28 +226,31 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: VARCHAR(36) # PK: UUID en tant que String
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: colis_id
-                  type: VARCHAR(36) # FK type ajusté
-                  constraints:
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { nullable: false }
               - column:
                   name: statut_precedent
                   type: VARCHAR(50)
               - column:
                   name: statut_actuel
                   type: VARCHAR(50)
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
               - column:
                   name: date_changement
                   type: TIMESTAMP
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: commentaire
+                  type: TEXT
+              - column:
+                  name: date_creation
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # 001-8: Table de Jonction COLIS_PRODUIT
   - changeSet:
@@ -235,24 +262,26 @@ databaseChangeLog:
             columns:
               - column:
                   name: colis_id
-                  type: VARCHAR(36) # PK/FK type ajusté
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: produit_id
-                  type: VARCHAR(36) # PK/FK type ajusté
-                  constraints:
-                    primaryKey: true
-                    nullable: false
+                  type: VARCHAR(36)
+                  constraints: { primaryKey: true, nullable: false }
               - column:
                   name: quantite
                   type: INT
-                  constraints:
-                    nullable: false
+                  constraints: { nullable: false }
+              - column:
+                  name: prix_unitaire
+                  type: NUMERIC(10, 2)
+              - column:
+                  name: date_ajout
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
 
   # ===============================================
-  # 002. CREATION DES CONTRAINTES DE CLÉ ÉTRANGÈRE (FKS)
+  # 002. CRÉATION DES CONTRAINTES DE CLÉ ÉTRANGÈRE (FKS)
   # ===============================================
 
   # 002-1: FK pour LIVREUR (Livreur -> Zone)
@@ -303,7 +332,7 @@ databaseChangeLog:
             baseColumnNames: livreur_id
             baseTableName: colis
             constraintName: fk_colis_livreur
-            onDelete: SET NULL # Un livreur peut changer
+            onDelete: SET NULL
             referencedColumnNames: id
             referencedTableName: livreur
 
@@ -329,7 +358,7 @@ databaseChangeLog:
             baseColumnNames: colis_id
             baseTableName: historique_livraison
             constraintName: fk_historique_colis
-            onDelete: CASCADE # L'historique doit disparaître si le colis est supprimé
+            onDelete: CASCADE
             referencedColumnNames: id
             referencedTableName: colis
 
