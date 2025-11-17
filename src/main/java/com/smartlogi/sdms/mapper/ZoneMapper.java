@@ -3,6 +3,7 @@ package com.smartlogi.sdms.mapper;
 import com.smartlogi.sdms.DTO.ZoneDto;
 import com.smartlogi.sdms.model.Zone;
 import org.mapstruct.Mapper;
+import java.util.List;
 
 /**
  * Interface MapStruct pour la conversion entre Zone et ZoneDto.
@@ -16,7 +17,7 @@ public interface ZoneMapper {
      * @return Le DTO correspondant.
      */
     ZoneDto toDto(Zone zone);
-
+    List<ZoneDto> toDto(List<Zone> zones);
     /**
      * Convertit un ZoneDto en entité Zone.
      * @param zoneDto Le DTO à convertir.
