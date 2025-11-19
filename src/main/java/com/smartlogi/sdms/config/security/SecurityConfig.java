@@ -1,5 +1,6 @@
 package com.smartlogi.sdms.config.security;
 
+import com.smartlogi.sdms.config.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,57 +24,51 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // --- 1. PasswordEncoder inchangé ---
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // --- 2. Configuration CORS stricte (CORRIGÉE : Renvoie CorsConfigurationSource) ---
-    // Renommer la méthode et changer le type de retour
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() { // <--- Changement ici
+    public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-
-        // N'autoriser que les frontends internes
         config.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://localhost:3000", "http://localhost:8080"));
-
-        // Autoriser les méthodes REST classiques
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Autoriser les headers
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-
-        // Important
         config.setAllowCredentials(true);
-
         source.registerCorsConfiguration("/**", config);
-        return source; // <--- Retourne l'objet source directement
+        return source;
     }
 
-    // --- 3. Configuration principale de la Sécurité (CORRIGÉE) ---
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Désactiver le CSRF
                 .csrf(AbstractHttpConfigurer::disable)
+                // Utilise la configuration CORS définie au-dessus
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Ajouter le filtre CORS en premier
-                // Spring Security détectera automatiquement le Bean CorsConfigurationSource
-                // et l'utilisera si la lambda est vide ou si on appelle .withDefaults()
-                .cors(cors -> {}) // Ou .cors(withDefaults()) ou .cors(Customizer.withDefaults())
-                // Laisser la lambda vide suffit.
-
-                // Activer le mode stateless (très important pour JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Définition des règles d'autorisation
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
-                );
+                ); // <-- On ferme bien le bloc des autorisations ici
+
+        // Le filtre doit être ajouté à l'objet 'http', pas dans 'authorizeHttpRequests'
+        http.addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public org.springframework.security.authentication.AuthenticationManager authenticationManager(org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
