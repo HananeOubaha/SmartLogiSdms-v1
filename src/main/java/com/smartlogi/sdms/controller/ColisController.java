@@ -49,7 +49,7 @@ public class ColisController {
     @Operation(summary = "Récupère un colis par son ID (pour le suivi)")
     @ApiResponse(responseCode = "404", description = "Colis non trouvé")
     @GetMapping("/{id}")
-    // CORRECTION : id doit être String
+
     public ResponseEntity<ColisDto> getColisById(@PathVariable String id) {
         return ResponseEntity.ok(colisService.getColisById(id));
     }
