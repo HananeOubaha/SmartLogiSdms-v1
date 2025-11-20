@@ -46,23 +46,19 @@ public class ProduitServiceTest {
 
         // DTO initial
         mockDto = new ProduitDto(
-                null, "Drone DJI", "Électronique", 1.5, 12000.00
-        );
+                null, "Drone DJI", "Électronique", 1.5, 12000.00);
 
         // Entité mockée
         mockEntity = new Produit(
-                testId, "Drone DJI", "Électronique", 1.5, 12000.00, null
-        );
+                testId, "Drone DJI", "Électronique", 1.5, 12000.00, null);
 
         // DTO attendu
         createdDto = new ProduitDto(
-                testId, "Drone DJI", "Électronique", 1.5, 12000.00
-        );
+                testId, "Drone DJI", "Électronique", 1.5, 12000.00);
 
         // DTO pour la mise à jour
         updateDto = new ProduitDto(
-                testId, "Batterie Drone", "Accessoire", 0.5, 500.00
-        );
+                testId, "Batterie Drone", "Accessoire", 0.5, 500.00);
     }
 
     // =================================================================

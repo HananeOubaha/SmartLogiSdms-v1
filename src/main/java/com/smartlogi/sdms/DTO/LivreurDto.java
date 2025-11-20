@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-// Suppression de l'import java.util.UUID
 
 @Data
 @NoArgsConstructor
@@ -14,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "DTO pour l'entité Livreur.")
 public class LivreurDto {
 
-    // CORRECTION ICI : Changé de UUID à String
     @Schema(description = "Identifiant unique du livreur (lecture seule)", example = "a1b2c3d4-e5f6-7g8h-...")
-    private String id; // <-- CHANGÉ DE UUID À STRING
+    private String id;
 
     @NotBlank(message = "Le nom est obligatoire")
     @Size(max = 100, message = "Le nom ne doit pas dépasser 100 caractères")
@@ -37,6 +35,6 @@ public class LivreurDto {
     @Schema(example = "Camionnette", required = true)
     private String vehicule;
 
-    @Schema(description = "Zone ou ville par défaut assignée au livreur", example = "Marrakech Gueliz")
-    private String zoneAssignee;
+    @Schema(description = "ID de la zone assignée au livreur", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String zoneId;
 }

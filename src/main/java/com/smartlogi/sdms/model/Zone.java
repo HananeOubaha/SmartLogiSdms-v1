@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-// Suppression de l'import org.hibernate.annotations.GenericGenerator
-// Suppression de l'import java.util.UUID
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,26 +17,29 @@ public class Zone {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
-    private String id; // <-- CORRECTION: Changé de UUID à String
+    private String id;
 
-    @Column(name = "nom", nullable = false)
+    @Column(name = "nom", nullable = false, unique = true)
     private String nom;
 
     @Column(name = "code_postal")
     private String codePostal;
 
-    // Relation inverse : Une zone peut contenir plusieurs colis (pour la gestion logistique)
+    @Column(name = "date_creation", updatable = false)
+    private LocalDateTime dateCreation;
+
+    // Relation inverse : Une zone peut contenir plusieurs colis
     @OneToMany(mappedBy = "zone")
     private List<Colis> colisDansZone;
 
-    /**
-     * Logique pour générer l'ID UUID sous forme de String AVANT l'insertion.
-     */
+    // Relation inverse : Une zone peut avoir plusieurs livreurs
+    @OneToMany(mappedBy = "zone")
+    private List<Livreur> livreurs;
+
     @PrePersist
     protected void onPrePersist() {
-        if (this.id == null) {
-            // Génère un UUID et le stocke comme String
-            this.id = java.util.UUID.randomUUID().toString();
+        if (dateCreation == null) {
+            dateCreation = LocalDateTime.now();
         }
     }
 }

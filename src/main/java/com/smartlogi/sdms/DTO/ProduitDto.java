@@ -20,13 +20,13 @@ public class ProduitDto {
     @Schema(example = "Smartphone")
     private String nom;
 
-    @Schema(example = "Électronique")
-    private String categorie;
+    @Schema(example = "Appareil électronique de dernière génération")
+    private String description;
 
-    @NotNull(message = "Le poids est obligatoire")
+    @NotNull(message = "Le poids unitaire est obligatoire")
     @DecimalMin(value = "0.001", message = "Le poids doit être positif")
     @Schema(example = "0.350")
-    private Double poids;
+    private Double poidsUnitaire;
 
     @NotNull(message = "Le prix est obligatoire")
     @DecimalMin(value = "0.01", message = "Le prix doit être positif")

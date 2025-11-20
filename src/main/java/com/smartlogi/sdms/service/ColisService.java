@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-// Suppression de l'import java.util.UUID car il est remplacé par String
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +31,15 @@ public class ColisService {
 
     // --- Méthode de Traçabilité ---
     private void enregistrerHistorique(Colis colis, String commentaire) {
+        enregistrerHistorique(colis, null, colis.getStatut(), commentaire);
+    }
+
+    private void enregistrerHistorique(Colis colis, StatutColis statutPrecedent, StatutColis statutActuel,
+            String commentaire) {
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setColis(colis);
-        historique.setStatut(colis.getStatut().name());
+        historique.setStatutPrecedent(statutPrecedent != null ? statutPrecedent.name() : null);
+        historique.setStatutActuel(statutActuel.name());
         historique.setDateChangement(LocalDateTime.now());
         historique.setCommentaire(commentaire);
 
@@ -50,7 +54,6 @@ public class ColisService {
     public ColisDto createColis(ColisCreationDto creationDto) {
 
         // 1. Validation de l'existence des IDs String (vérifie les FKs)
-        // Les services sont censés avoir été corrigés pour accepter les String.
         ClientExpéditeur client = clientExpéditeurService.getClientEntityById(creationDto.getClientExpediteurId());
         Destinataire destinataire = destinataireService.getDestinataireEntityById(creationDto.getDestinataireId());
         Zone zone = zoneService.getZoneEntityById(creationDto.getZoneId());
@@ -76,7 +79,6 @@ public class ColisService {
     // 2. AFFICHAGE (READ)
     // ============================================
 
-    // CORRECTION : id doit être String
     public ColisDto getColisById(String id) {
         Colis colis = colisRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + id));
@@ -92,17 +94,17 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    // CORRECTION : colisId doit être String
     public ColisDto updateStatut(String colisId, StatutColis nouveauStatut, String commentaire) {
         Colis colis = colisRepository.findById(colisId)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
 
+        StatutColis ancienStatut = colis.getStatut();
         colis.setStatut(nouveauStatut);
 
         Colis updatedColis = colisRepository.save(colis);
 
-        // Enregistrement de la nouvelle étape de l'historique
-        enregistrerHistorique(updatedColis, commentaire);
+        // Enregistrement de la nouvelle étape de l'historique avec statut précédent
+        enregistrerHistorique(updatedColis, ancienStatut, nouveauStatut, commentaire);
 
         // Logique spécifique au workflow:
         if (nouveauStatut == StatutColis.COLLECTE) {
@@ -117,7 +119,6 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    // CORRECTION : colisId et livreurId doivent être String
     public ColisDto assignerLivreur(String colisId, String livreurId) {
         Colis colis = colisRepository.findById(colisId)
                 .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
@@ -126,13 +127,15 @@ public class ColisService {
 
         colis.setLivreur(livreur);
 
-        // Changement de statut automatique: EN_TRANSIT ou EN_TOURNEE
+        // Changement de statut automatique: EN_TRANSIT
+        StatutColis ancienStatut = colis.getStatut();
         colis.setStatut(StatutColis.EN_TRANSIT);
 
         Colis updatedColis = colisRepository.save(colis);
 
-        // Enregistrement de l'historique de l'affectation
-        enregistrerHistorique(updatedColis, "Colis affecté au livreur: " + livreur.getNom() + " " + livreur.getPrenom() + ".");
+        // Enregistrement de l'historique de l'affectation avec statut précédent
+        enregistrerHistorique(updatedColis, ancienStatut, StatutColis.EN_TRANSIT,
+                "Colis affecté au livreur: " + livreur.getNom() + " " + livreur.getPrenom() + ".");
 
         return colisMapper.toDto(updatedColis);
     }
@@ -142,7 +145,6 @@ public class ColisService {
     // ============================================
 
     @Transactional
-    // CORRECTION : id doit être String
     public void deleteColis(String id) {
         if (!colisRepository.existsById(id)) {
             throw new EntityNotFoundException("Colis non trouvé avec l'ID: " + id);

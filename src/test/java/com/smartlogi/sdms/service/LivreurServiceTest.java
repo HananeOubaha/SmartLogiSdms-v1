@@ -45,25 +45,22 @@ public class LivreurServiceTest {
 
         // DTO initial
         mockDto = new LivreurDto(
-                null, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz"
-        );
+                null, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz");
 
         // Entité mockée avec l'ID simulé
         // CORRECTION ASSUMÉE (6 champs + List<Colis>)
         mockEntity = new Livreur(
                 testId, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz", null
-                // Si Livreur n'a que 7 champs (6 attributs + 1 List), retirez un 'null'
+        // Si Livreur n'a que 7 champs (6 attributs + 1 List), retirez un 'null'
         );
 
         // DTO attendu
         createdDto = new LivreurDto(
-                testId, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz"
-        );
+                testId, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz");
 
         // DTO pour la mise à jour
         updateDto = new LivreurDto(
-                testId, "Cherkaoui", "Fouad", "0699887766", "Moto", "Rabat Centre"
-        );
+                testId, "Cherkaoui", "Fouad", "0699887766", "Moto", "Rabat Centre");
     }
 
     // =================================================================

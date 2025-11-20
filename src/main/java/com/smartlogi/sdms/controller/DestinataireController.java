@@ -9,66 +9,58 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Import obligatoire
 import org.springframework.web.bind.annotation.*;
-// Suppression de l'import java.util.UUID
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/destinataires")
 @RequiredArgsConstructor
-@Tag(name = "C. Gestion des Destinataires", description = "Endpoints pour les destinataires de colis.")
+@Tag(name = "C. Gestion des Destinataires", description = "Endpoints sécurisés pour la gestion des destinataires de colis.")
 public class DestinataireController {
 
     private final DestinataireService destinataireService;
 
-    // POST /api/destinataires
-    @Operation(summary = "Crée un nouveau destinataire")
-    @ApiResponse(responseCode = "201", description = "Destinataire créé avec succès")
-    @ApiResponse(responseCode = "400", description = "Validation échouée")
+    // Seul le Gestionnaire ou le Client (pour créer un envoi) peuvent créer un destinataire
+    @Operation(summary = "Crée un nouveau destinataire (Gestionnaire ou Client)")
     @PostMapping
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_CLIENT')")
     public ResponseEntity<DestinataireDto> createDestinataire(@Valid @RequestBody DestinataireDto destinataireDto) {
         DestinataireDto createdDestinataire = destinataireService.createDestinataire(destinataireDto);
         return new ResponseEntity<>(createdDestinataire, HttpStatus.CREATED);
     }
 
-    // GET /api/destinataires
-    @Operation(summary = "Récupère tous les destinataires")
-    @ApiResponse(responseCode = "200", description = "Liste des destinataires retournée")
+    // Seul le Gestionnaire peut voir la liste complète
+    @Operation(summary = "Récupère tous les destinataires (Gestionnaire uniquement)")
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<List<DestinataireDto>> getAllDestinataires() {
         List<DestinataireDto> destinataires = destinataireService.getAllDestinataires();
         return ResponseEntity.ok(destinataires);
     }
 
-    // GET /api/destinataires/{id}
+    // Le Gestionnaire ou les autres rôles autorisés (pour vérification)
     @Operation(summary = "Récupère un destinataire par son ID")
-    @ApiResponse(responseCode = "200", description = "Destinataire trouvé")
-    @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
     @GetMapping("/{id}")
-    // CORRECTION : id doit être String
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_CLIENT')")
     public ResponseEntity<DestinataireDto> getDestinataireById(@PathVariable String id) {
         DestinataireDto destinataireDto = destinataireService.getDestinataireById(id);
         return ResponseEntity.ok(destinataireDto);
     }
 
-    // PUT /api/destinataires/{id}
-    @Operation(summary = "Met à jour un destinataire existant")
-    @ApiResponse(responseCode = "200", description = "Destinataire mis à jour avec succès")
-    @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
+    // Modification et Suppression réservées au Gestionnaire
+    @Operation(summary = "Met à jour un destinataire (Gestionnaire uniquement)")
     @PutMapping("/{id}")
-    // CORRECTION : id doit être String
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<DestinataireDto> updateDestinataire(@PathVariable String id, @Valid @RequestBody DestinataireDto destinataireDto) {
         DestinataireDto updatedDestinataire = destinataireService.updateDestinataire(id, destinataireDto);
         return ResponseEntity.ok(updatedDestinataire);
     }
 
-    // DELETE /api/destinataires/{id}
-    @Operation(summary = "Supprime un destinataire par son ID")
-    @ApiResponse(responseCode = "204", description = "Destinataire supprimé (No Content)")
-    @ApiResponse(responseCode = "404", description = "Destinataire non trouvé")
+    @Operation(summary = "Supprime un destinataire (Gestionnaire uniquement)")
     @DeleteMapping("/{id}")
-    // CORRECTION : id doit être String
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ResponseEntity<Void> deleteDestinataire(@PathVariable String id) {
         destinataireService.deleteDestinataire(id);
         return ResponseEntity.noContent().build();
