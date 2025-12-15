@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import com.smartlogi.sdms.enums.Role;
+
 
 import java.util.Optional;
 import java.util.List;
@@ -51,8 +53,16 @@ public class LivreurServiceTest {
         // Entité mockée avec l'ID simulé
         // CORRECTION ASSUMÉE (6 champs + List<Colis>)
         mockEntity = new Livreur(
-                testId, "Idrissi", "Rachid", "0701020304", "Camionnette", "Marrakech Gueliz", null
-                // Si Livreur n'a que 7 champs (6 attributs + 1 List), retirez un 'null'
+                testId,
+                "Idrissi",
+                "Rachid",
+                "rachid@livreur.com",   // email (Nouveau champ ajouté précédemment)
+                "0701020304",
+                "Camionnette",
+                "Marrakech Gueliz",
+                "encodedPassword",      // password (nouveau)
+                Role.ROLE_LIVREUR,      // role (nouveau)
+                null                    // colisAssignes
         );
 
         // DTO attendu

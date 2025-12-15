@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20251120-SEC-02-LIVREUR-EMAIL
+      author: smartlogi_security
+      changes:
+        - addColumn:
+            tableName: livreur
+            columns:
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true

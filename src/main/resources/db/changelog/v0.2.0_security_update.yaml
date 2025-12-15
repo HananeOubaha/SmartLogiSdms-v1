@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20251119-SEC-01
+      author: smartlogi_security
+      changes:
+        # Ajout sécurité pour CLIENT_EXPEDITEUR
+        - addColumn:
+            tableName: client_expediteur
+            columns:
+              - column:
+                  name: password
+                  type: VARCHAR(255) # Hash BCrypt
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+                  defaultValue: 'ROLE_CLIENT'
+                  constraints:
+                    nullable: false
+
+        # Ajout sécurité pour LIVREUR
+        - addColumn:
+            tableName: livreur
+            columns:
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+                  defaultValue: 'ROLE_LIVREUR'
+                  constraints:
+                    nullable: false

@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
+import com.smartlogi.sdms.enums.Role;
 
 import java.util.Optional;
 import java.util.List;
@@ -55,7 +56,15 @@ public class ClientExpéditeurServiceTest {
 
         // Entité mockée avec l'ID simulé
         mockEntity = new ClientExpéditeur(
-                testId, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa", null
+                testId,
+                "Akermi",
+                "Youssef",
+                "test@email.com",
+                "0611223344",
+                "12 Rue Casa",
+                "encodedPassword",      // password (nouveau)
+                Role.ROLE_CLIENT,       // role (nouveau)
+                null                    // colisEnvoyes
         );
 
         // DTO attendu après la création/lecture

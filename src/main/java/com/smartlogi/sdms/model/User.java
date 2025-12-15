@@ -1,3 +1,4 @@
+/*
 package com.smartlogi.sdms.model;
 
 import lombok.Data;
@@ -10,3 +11,4 @@ public class User {
     private String password;
     private String role;
 }
+*/

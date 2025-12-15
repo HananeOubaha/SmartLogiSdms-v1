@@ -1,7 +1,7 @@
 package com.smartlogi.sdms.enums;
 
 public enum Role {
-    Manager,
-    Livreur,
-    Client
+    ROLE_MANAGER,
+    ROLE_LIVREUR,
+    ROLE_CLIENT;
 }

@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/001-base-schema.yaml
+  - include:
+      file: db/changelog/v0.2.0_security_update.yaml
+  - include:
+      file: db/changelog/v0.3.0_livreur_email.yaml

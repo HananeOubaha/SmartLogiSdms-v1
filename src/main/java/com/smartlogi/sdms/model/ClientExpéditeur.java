@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.smartlogi.sdms.enums.Role;
 // Suppression de l'import org.hibernate.annotations.GenericGenerator
 import java.util.List;
 // Suppression de l'import java.util.UUID
@@ -36,6 +37,13 @@ public class ClientExpéditeur {
     @Column(name = "adresse", length = 255)
     private String adresse;
 
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role = Role.ROLE_CLIENT;
+
     // Relation: Un expéditeur peut envoyer plusieurs colis.
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Colis> colisEnvoyes;
@@ -51,6 +59,4 @@ public class ClientExpéditeur {
             this.id = java.util.UUID.randomUUID().toString();
         }
     }
-//hello
-    //HI
 }

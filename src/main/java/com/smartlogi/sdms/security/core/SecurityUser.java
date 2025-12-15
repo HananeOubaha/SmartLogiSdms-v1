@@ -1,7 +1,7 @@
-package com.smartlogi.sdms.security;
+package com.smartlogi.sdms.security.core;
 
 import com.smartlogi.sdms.enums.Role;
-import lombok.Data;
+import lombok.Data; // Génère getters, setters, etc.
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +11,9 @@ import java.util.Collections;
 
 @Data
 public class SecurityUser implements UserDetails {
-    private String UserID;
+
+    // CORRECTION : 'userId' en minuscule (camelCase)
+    private String userId;
 
     private String username;
 
@@ -19,8 +21,9 @@ public class SecurityUser implements UserDetails {
 
     private Role role;
 
-    public SecurityUser(String userID, String username, String password, Role role) {
-        this.UserID = userID;
+    // Constructeur corrigé pour utiliser le champ 'userId'
+    public SecurityUser(String userId, String username, String password, Role role) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = role;
@@ -28,7 +31,20 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Transforme l'Enum Role en une autorité Spring Security
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
+    }
+
+    // --- Méthodes UserDetails ---
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
     }
 
     // Le compte n'expire jamais (pour la v0.2.0)

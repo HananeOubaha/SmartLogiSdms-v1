@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import com.smartlogi.sdms.enums.Role;
 
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -78,7 +79,18 @@ public class ColisServiceTest {
         );
 
         // 2. Entités de dépendance mockées (doivent exister pour la FK)
-        mockClient = new ClientExpéditeur(clientExpediteurId, "Ali", "M.", "a@a.com", "06", "Adr", null);
+        mockClient = new ClientExpéditeur(
+                clientExpediteurId,
+                "Ali",
+                "M.",
+                "a@a.com",
+                "06",
+                "Adr",
+                "pass",             // password
+                Role.ROLE_CLIENT,   // role
+                null
+        );
+
         mockLivreur = new Livreur(livreurId, "Rachid", "I.", "07", "Moto", "Zone X", null);
 
         // 3. Entité Colis résultante (après save)
