@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: smartlogi-sdms
+
+  profiles:
+    active: ci
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+# Configuration JWT
+jwt:
+  secret: duainIbvm6qS9wZvHcHgswRdH0QiBhbpirG37iS1AHcv00rPWBkss7jz0zQ8EGq0tWcCgBoaVcn+jnoh4UIRew==
+  expiration:
+    ms: 86400000
+
+# Server Configuration
+server:
+  port: 8080
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration
+logging:
+  level:
+    root: WARN
+    com.smartlogi: INFO
+    org.springframework.test: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+

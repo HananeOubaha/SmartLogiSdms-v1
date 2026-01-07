@@ -1,0 +1,231 @@
+# ============================================================================
+# DOCKER-COMPOSE.YML - Orchestration complète SmartLogi SDMS v0.3.0
+# ============================================================================
+# Services :
+# - sdms : Application Spring Boot
+# - postgres : Base de données PostgreSQL
+# - pgadmin : Interface d'administration PostgreSQL
+# - sonarqube : Analyse qualité du code
+# - jenkins : Intégration continue (optionnel)
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ========== PostgreSQL ==========
+  postgres:
+    image: postgres:15-alpine
+    container_name: smartlogi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smartlogi1_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - smartlogi-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      description: "PostgreSQL Database for SmartLogi SDMS"
+
+  # ========== PgAdmin ==========
+  pgadmin:
+    image: dpage/pgadmin4:8.0-latest
+    container_name: smartlogi-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@smartlogi.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_PROXY_X_FOR_COUNT: 1
+      PGADMIN_CONFIG_PROXY_X_PROTO_COUNT: 1
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - smartlogi-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      description: "PgAdmin - PostgreSQL Management Interface"
+
+  # ========== SonarQube ==========
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: smartlogi-sonarqube
+    restart: unless-stopped
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonarqube
+      SONAR_JDBC_USERNAME: postgres
+      SONAR_JDBC_PASSWORD: root
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLED: 'true'
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+    networks:
+      - smartlogi-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      description: "SonarQube - Code Quality Analysis"
+
+  # ========== SmartLogi SDMS Application ==========
+  sdms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: target/sdms-0.3.0-SNAPSHOT.jar
+        APP_HOME: /app
+    image: smartlogi/sdms:0.3.0
+    container_name: smartlogi-sdms
+    restart: unless-stopped
+    environment:
+      # Spring Configuration
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_APPLICATION_NAME: smartlogi-sdms
+
+      # Database Configuration
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/smartlogi1_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+      # JPA Configuration
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_SHOW_SQL: 'false'
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQL15Dialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: 'true'
+
+      # Liquibase Configuration
+      SPRING_LIQUIBASE_ENABLED: 'true'
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/db.changelog-master.yaml
+
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET:-duainIbvm6qS9wZvHcHgswRdH0QiBhbpirG37iS1AHcv00rPWBkss7jz0zQ8EGq0tWcCgBoaVcn+jnoh4UIRew==}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+
+      # Server Configuration
+      SERVER_PORT: 8080
+      SERVER_SERVLET_CONTEXT_PATH: /api
+
+      # Logging Configuration
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_SMARTLOGI: DEBUG
+
+      # Java Options
+      JAVA_OPTS: -Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200
+
+      # Timezone
+      TZ: Europe/Paris
+
+    volumes:
+      - ./logs:/app/logs
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - smartlogi-network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/api/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    labels:
+      description: "SmartLogi SDMS - Delivery Management System v0.3.0"
+
+  # ========== Jenkins (Optionnel pour CI/CD local) ==========
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: smartlogi-jenkins
+    restart: unless-stopped
+    environment:
+      JENKINS_OPTS: |
+        --httpListenAddress=0.0.0.0
+        --httpPort=8081
+        --prefix=/jenkins
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8081:8081"
+    networks:
+      - smartlogi-network
+    labels:
+      description: "Jenkins - CI/CD Server (Optional)"
+
+# ========== NETWORKS ==========
+networks:
+  smartlogi-network:
+    driver: bridge
+
+# ========== VOLUMES ==========
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonarqube_logs:
+    driver: local
+  jenkins_data:
+    driver: local
+
+# ============================================================================
+# Instructions d'utilisation :
+#
+# 1. Pré-requis :
+#    - Docker & Docker Compose installés
+#    - Java 17 pour le build Maven
+#
+# 2. Build de l'image SDMS :
+#    mvn clean package -DskipTests
+#
+# 3. Lancer les services :
+#    docker-compose up -d
+#
+# 4. Arrêter les services :
+#    docker-compose down
+#
+# 5. Voir les logs :
+#    docker-compose logs -f sdms
+#    docker-compose logs -f postgres
+#    docker-compose logs -f sonarqube
+#
+# 6. Accès aux services :
+#    - SDMS : http://localhost:8080/api
+#    - PgAdmin : http://localhost:5050
+#    - SonarQube : http://localhost:9000
+#    - Jenkins : http://localhost:8081
+#
+# 7. Nettoyer tout (attention : supprime les données) :
+#    docker-compose down -v
+#
+# ============================================================================
+

@@ -1,33 +1,152 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ============================================================================
+# .GITIGNORE - Configuration Git pour SmartLogi SDMS
+# ============================================================================
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+# ========== IDE & Editors ==========
+.idea/
 .vscode/
+*.swp
+*.swo
+*~
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+# ========== Build & Dependencies ==========
+/target/
+/build/
+*.jar
+*.war
+*.zip
+*.rar
+*.7z
+.gradle/
+out/
+dist/
+node_modules/
+
+# ========== Maven ==========
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+.flattened-pom.xml
+
+# ========== Logs & Output ==========
+logs/
+*.log
+*.out
+*.err
+*.pid
+*.seed
+*.pid.lock
+
+# ========== Database ==========
+*.db
+*.sqlite
+*.sqlite3
+*.h2.db
+/data/
+
+# ========== Docker ==========
+docker-compose.override.yml
+.dockerignore
+Dockerfile.dev
+
+# ========== Environment & Configuration ==========
+.env
+.env.local
+.env.*.local
+application-local.properties
+application-local.yml
+application-secrets.properties
+application-secrets.yml
+config/secrets/
+
+# ========== Jenkins ==========
+.jenkins/
+jenkins_home/
+pipeline.log
+
+# ========== SonarQube ==========
+.sonarqube/
+.sonar/
+
+# ========== Git ==========
+.git/
+.gitattributes
+
+# ========== OS ==========
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ========== Temporary Files ==========
+*.tmp
+*.bak
+*.backup
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+.~*
+$*.tmp
+
+# ========== Node/NPM (si applicable) ==========
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# ========== Python (si applicable) ==========
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+
+# ========== Test Coverage ==========
+jacoco.exec
+coverage/
+lcov.info
+
+# ========== IDE Generated Files ==========
+*.class
+*.classpath
+.factorypath
+.apt_generated
+.apt_generated_tests
+
+# ========== Custom SmartLogi ==========
+/config/local/
+/secrets/
+/temp/
+/cache/
+
+# ========== Documentation Build ==========
+/docs/_build/
+/site/
+
+# ========== Archives ==========
+*.zip
+*.tar.gz
+*.rar
+
+# ========== Exception pour certains fichiers ==========
+!.gitkeep
+!.env.example
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+

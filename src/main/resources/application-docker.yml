@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: smartlogi-sdms
+
+  profiles:
+    active: docker
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/smartlogi1_db
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL15Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: public
+
+# Configuration JWT
+jwt:
+  secret: ${JWT_SECRET:duainIbvm6qS9wZvHcHgswRdH0QiBhbpirG37iS1AHcv00rPWBkss7jz0zQ8EGq0tWcCgBoaVcn+jnoh4UIRew==}
+  expiration:
+    ms: ${JWT_EXPIRATION_MS:86400000}
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.smartlogi: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 10
+      total-size-cap: 1GB
+
+# Jackson Configuration
+spring:
+  jackson:
+    serialization:
+      indent-output: true
+      write-dates-as-timestamps: false
+    time-zone: Europe/Paris
+    default-property-inclusion: non_null
+
