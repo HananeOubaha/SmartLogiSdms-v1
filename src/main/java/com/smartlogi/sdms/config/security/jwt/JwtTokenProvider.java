@@ -2,17 +2,23 @@ package com.smartlogi.sdms.config.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -20,10 +26,14 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration.ms}")
     private long jwtExpirationMs;
 
-    // Clé de signature JWT
+    private Key cachedKey;
+
+    // Clé de signature JWT - cachée pour éviter les recalculs
     private Key key() {
-        // Utilise la clé secrète du fichier de configuration pour créer une clé de sécurité.
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        if (cachedKey == null) {
+            cachedKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        }
+        return cachedKey;
     }
 
     // 1. Générer le Token JWT
@@ -57,19 +67,38 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    // 2.1. Extraire les rôles du Token
+    public List<String> getRolesFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            String roles = claims.get("roles", String.class);
+            if (roles != null && !roles.isEmpty()) {
+                return Arrays.asList(roles.split(","));
+            }
+            return List.of();
+        } catch (JwtException | IllegalArgumentException ex) {
+            logger.error("Erreur lors de l'extraction des rôles du token", ex);
+            return List.of();
+        }
+    }
+
     // 3. Valider le Token JWT
     public boolean validateToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException ex) {
-            System.err.println("Token JWT Invalide");
+            logger.error("Token JWT Invalide: {}", ex.getMessage());
         } catch (ExpiredJwtException ex) {
-            System.err.println("Token JWT Expiré");
+            logger.error("Token JWT Expiré: {}", ex.getMessage());
         } catch (UnsupportedJwtException ex) {
-            System.err.println("Token JWT Non Supporté");
+            logger.error("Token JWT Non Supporté: {}", ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            System.err.println("Chaîne JWT vide ou nulle");
+            logger.error("Chaîne JWT vide ou nulle: {}", ex.getMessage());
         }
         return false;
     }
