@@ -19,32 +19,36 @@ public class ClientExpéditeur {
     @Column(name = "id", columnDefinition = "VARCHAR(36)")
     private String id;
 
-    @Column(name = "nom", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String nom;
 
-    @Column(name = "prenom", length = 100)
+    @Column(length = 100)
     private String prenom;
 
-    @Column(name = "email", unique = true, length = 150)
+    @Column(unique = true, nullable = false, length = 150)
     private String email;
 
-    @Column(name = "telephone", length = 20)
+    @Column(nullable = false, length = 20)
     private String telephone;
 
-    @Column(name = "adresse", length = 255)
+    @Column(nullable = false, length = 255)
     private String adresse;
 
-    @Column(name = "date_creation", updatable = false)
+    // 🔐 Champs sécurité
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String role = "ROLE_CLIENT";
+
+    @Column(updatable = false)
     private LocalDateTime dateCreation;
 
-    // Relation: Un expéditeur peut envoyer plusieurs colis.
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Colis> colisEnvoyes;
 
     @PrePersist
     protected void onPrePersist() {
-        if (dateCreation == null) {
-            dateCreation = LocalDateTime.now();
-        }
+        dateCreation = LocalDateTime.now();
     }
 }
