@@ -1,77 +1,61 @@
 package com.smartlogi.sdms.controller;
 
 import com.smartlogi.sdms.DTO.ZoneDto;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import com.smartlogi.sdms.service.ZoneService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Import darouri
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-// Suppression de l'import java.util.UUID
+
 import java.util.List;
 
 /**
- * Contrôleur REST pour l'entité Zone.
- * Point d'entrée pour les requêtes HTTP.
+ * Contrôleur REST pour l'entité Zone sécurisé par rôles.
  */
 @RestController
 @RequestMapping("/api/zones")
 @RequiredArgsConstructor
-@Tag(name = "A. Gestion des Zones", description = "Endpoints pour la gestion des zones de livraison (CRUD).")
+@PreAuthorize("hasRole('ROLE_MANAGER')") // Seul le gestionnaire peut manipuler les zones
+@Tag(name = "A. Gestion des Zones", description = "Endpoints réservés au Gestionnaire pour configurer le réseau logistique.")
 public class ZoneController {
 
     private final ZoneService zoneService;
 
-    // POST /api/zones
-    @Operation(summary = "Crée une nouvelle zone de livraison") // <-- Opération
-    @ApiResponse(responseCode = "201", description = "Zone créée avec succès")
-    @ApiResponse(responseCode = "400", description = "Données d'entrée invalides (validation)")
+    @Operation(summary = "Crée une nouvelle zone (Gestionnaire uniquement)")
     @PostMapping
     public ResponseEntity<ZoneDto> createZone(@Valid @RequestBody ZoneDto zoneDto) {
         ZoneDto createdZone = zoneService.createZone(zoneDto);
         return new ResponseEntity<>(createdZone, HttpStatus.CREATED);
     }
 
-    // GET /api/zones
-    @Operation(summary = "Récupère toutes les zones")
-    @ApiResponse(responseCode = "200", description = "Liste des zones retournée")
+    @Operation(summary = "Récupère toutes les zones (Gestionnaire uniquement)")
     @GetMapping
     public ResponseEntity<List<ZoneDto>> getAllZones() {
         List<ZoneDto> zones = zoneService.getAllZones();
         return ResponseEntity.ok(zones);
     }
 
-    // GET /api/zones/{id}
-    @Operation(summary = "Récupère une zone par son ID")
-    @ApiResponse(responseCode = "200", description = "Zone trouvée")
-    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
+    @Operation(summary = "Récupère une zone par ID (Gestionnaire uniquement)")
     @GetMapping("/{id}")
-    // CORRECTION : id doit être String
     public ResponseEntity<ZoneDto> getZoneById(@PathVariable String id) {
         ZoneDto zoneDto = zoneService.getZoneById(id);
         return ResponseEntity.ok(zoneDto);
     }
 
-    // PUT /api/zones/{id}
-    @Operation(summary = "Met à jour une zone existante")
-    @ApiResponse(responseCode = "200", description = "Zone mise à jour avec succès")
-    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
+    @Operation(summary = "Met à jour une zone (Gestionnaire uniquement)")
     @PutMapping("/{id}")
-    // CORRECTION : id doit être String
     public ResponseEntity<ZoneDto> updateZone(@PathVariable String id, @Valid @RequestBody ZoneDto zoneDto) {
         ZoneDto updatedZone = zoneService.updateZone(id, zoneDto);
         return ResponseEntity.ok(updatedZone);
     }
 
-    // DELETE /api/zones/{id}
-    @Operation(summary = "Supprime une zone par son ID")
-    @ApiResponse(responseCode = "204", description = "Zone supprimée (No Content)")
-    @ApiResponse(responseCode = "404", description = "Zone non trouvée")
+    @Operation(summary = "Supprime une zone (Gestionnaire uniquement)")
     @DeleteMapping("/{id}")
-    // CORRECTION : id doit être String
     public ResponseEntity<Void> deleteZone(@PathVariable String id) {
         zoneService.deleteZone(id);
         return ResponseEntity.noContent().build();

@@ -50,23 +50,19 @@ public class ClientExpéditeurServiceTest {
 
         // DTO initial pour la création/lecture
         mockDto = new ClientExpéditeurDto(
-                null, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa"
-        );
+                null, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa");
 
         // Entité mockée avec l'ID simulé
         mockEntity = new ClientExpéditeur(
-                testId, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa", null
-        );
+                testId, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa", null);
 
         // DTO attendu après la création/lecture
         createdDto = new ClientExpéditeurDto(
-                testId, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa"
-        );
+                testId, "Akermi", "Youssef", "initial@email.com", "0611223344", "12 Rue Casa");
 
         // DTO pour la mise à jour
         updateDto = new ClientExpéditeurDto(
-                testId, "Dupont", "Jean", "new.email@test.com", "0700000000", "15 Avenue Modifiée"
-        );
+                testId, "Dupont", "Jean", "new.email@test.com", "0700000000", "15 Avenue Modifiée");
     }
 
     // =================================================================
@@ -78,7 +74,8 @@ public class ClientExpéditeurServiceTest {
         // GIVEN:
         // 1. Le Repository vérifie que l'email est unique (Optional.empty())
         when(clientExpéditeurRepository.findByEmail(mockDto.getEmail())).thenReturn(Optional.empty());
-        // 2. Le Mapper convertit le DTO en entité (l'ID sera généré par @PrePersist lors de save)
+        // 2. Le Mapper convertit le DTO en entité (l'ID sera généré par @PrePersist
+        // lors de save)
         when(clientExpéditeurMapper.toEntity(mockDto)).thenReturn(mockEntity);
         // 3. La sauvegarde retourne l'entité avec l'ID
         when(clientExpéditeurRepository.save(mockEntity)).thenReturn(mockEntity);
@@ -169,7 +166,8 @@ public class ClientExpéditeurServiceTest {
         when(clientExpéditeurRepository.save(any(ClientExpéditeur.class))).thenReturn(mockEntity);
         when(clientExpéditeurMapper.toDto(mockEntity)).thenReturn(updateDto);
 
-        // Le DTO de mise à jour utilise l'email non changé pour éviter le conflit dans ce cas
+        // Le DTO de mise à jour utilise l'email non changé pour éviter le conflit dans
+        // ce cas
         updateDto.setEmail("initial@email.com");
 
         // WHEN

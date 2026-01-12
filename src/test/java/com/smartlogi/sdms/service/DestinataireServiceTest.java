@@ -45,23 +45,19 @@ public class DestinataireServiceTest {
 
         // DTO initial
         mockDto = new DestinataireDto(
-                null, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat"
-        );
+                null, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat");
 
         // Entité mockée avec l'ID simulé
         mockEntity = new Destinataire(
-                testId, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat", null
-        );
+                testId, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat", null);
 
         // DTO attendu
         createdDto = new DestinataireDto(
-                testId, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat"
-        );
+                testId, "Hassani", "Samira", "samira@domicile.com", "0600000000", "12 Rue Rabat");
 
         // DTO pour la mise à jour
         updateDto = new DestinataireDto(
-                testId, "Alaoui", "Fatima", "fatima.alaoui@test.com", "0711223344", "25 Av. Marrakech"
-        );
+                testId, "Alaoui", "Fatima", "fatima.alaoui@test.com", "0711223344", "25 Av. Marrakech");
     }
 
     // =================================================================
@@ -81,7 +77,7 @@ public class DestinataireServiceTest {
         // THEN
         assertNotNull(result);
         assertEquals(testId, result.getId());
-//        assertEquals("Hassani", result.getNom());
+        // assertEquals("Hassani", result.getNom());
         verify(destinataireRepository, times(1)).save(any(Destinataire.class));
     }
 

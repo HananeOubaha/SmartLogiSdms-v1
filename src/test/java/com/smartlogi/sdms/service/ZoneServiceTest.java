@@ -45,26 +45,22 @@ public class ZoneServiceTest {
 
         // DTO initial
         mockDto = new ZoneDto(
-                null, "Casablanca Ouest", "21000"
-        );
+                null, "Casablanca Ouest", "21000");
 
         // Entité mockée avec l'ID simulé
         mockEntity = new Zone(
                 testId,
                 "Casablanca Ouest",
                 "21000",
-                null
-        );
+                null);
 
         // DTO attendu
         createdDto = new ZoneDto(
-                testId, "Casablanca Ouest", "21000"
-        );
+                testId, "Casablanca Ouest", "21000");
 
         // DTO pour la mise à jour
         updateDto = new ZoneDto(
-                testId, "Casablanca Anfa", "20000"
-        );
+                testId, "Casablanca Anfa", "20000");
     }
 
     // =================================================================

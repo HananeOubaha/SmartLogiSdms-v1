@@ -11,88 +11,83 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Import pour la sécurité des méthodes
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-// Suppression de l'import java.util.UUID
 
 @RestController
 @RequestMapping("/api/colis")
 @RequiredArgsConstructor
-@Tag(name = "E. Gestion du Flux des Colis", description = "Endpoints principaux pour la création, l'affectation et le suivi des livraisons.")
+@Tag(name = "E. Gestion du Flux des Colis", description = "Endpoints sécurisés par rôles pour le cycle de vie des colis.")
 public class ColisController {
 
     private final ColisService colisService;
 
     // ============================================
-    // CRUD de Base / Création
+    // 1. ESPACE CLIENT (ROLE_CLIENT)
     // ============================================
 
-    // POST /api/colis
-    @Operation(summary = "Crée une demande de colis (début du flux)")
-    @ApiResponse(responseCode = "201", description = "Colis créé avec statut 'CRÉÉ'")
-    @ApiResponse(responseCode = "404", description = "Client, Destinataire ou Zone ID non trouvée")
+    @Operation(summary = "Crée une demande de colis (Réservé au Client)")
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_CLIENT')") // Seul le client peut créer une demande
     public ResponseEntity<ColisDto> createColis(@Valid @RequestBody ColisCreationDto creationDto) {
         ColisDto createdColis = colisService.createColis(creationDto);
         return new ResponseEntity<>(createdColis, HttpStatus.CREATED);
     }
 
-    // GET /api/colis
-    @Operation(summary = "Récupère tous les colis (pour le Gestionnaire Logistique)")
+    // ============================================
+    // 2. ESPACE GESTIONNAIRE (ROLE_MANAGER)
+    // ============================================
+
+    @Operation(summary = "Récupère tous les colis (Réservé au Gestionnaire)")
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER')") // Accès complet pour le gestionnaire
     public ResponseEntity<List<ColisDto>> getAllColis() {
         return ResponseEntity.ok(colisService.getAllColis());
     }
 
-    // GET /api/colis/{id}
-    @Operation(summary = "Récupère un colis par son ID (pour le suivi)")
-    @ApiResponse(responseCode = "404", description = "Colis non trouvé")
-    @GetMapping("/{id}")
-    // CORRECTION : id doit être String
-    public ResponseEntity<ColisDto> getColisById(@PathVariable String id) {
-        return ResponseEntity.ok(colisService.getColisById(id));
-    }
-
-    // DELETE /api/colis/{id}
-    @Operation(summary = "Supprime un colis (Gestionnaire)")
-    @ApiResponse(responseCode = "204", description = "Colis supprimé")
+    @Operation(summary = "Supprime un colis (Réservé au Gestionnaire)")
     @DeleteMapping("/{id}")
-    // CORRECTION : id doit être String
+    @PreAuthorize("hasRole('ROLE_MANAGER')") // Le gestionnaire gère la suppression
     public ResponseEntity<Void> deleteColis(@PathVariable String id) {
         colisService.deleteColis(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ============================================
-    // WORKFLOW / LOGIQUE MÉTIER
-    // ============================================
-
-    // PUT /api/colis/assigner/{colisId} (User Story Gestionnaire Logistique)
-    @Operation(summary = "Assigne un colis à un livreur et le passe en EN_TRANSIT")
-    @ApiResponse(responseCode = "200", description = "Affectation réussie")
-    @ApiResponse(responseCode = "404", description = "Colis ou Livreur ID non trouvé")
+    @Operation(summary = "Assigne un colis à un livreur (Réservé au Gestionnaire)")
     @PutMapping("/assigner/{colisId}")
-    // CORRECTION : colisId et livreurId doivent être String
+    @PreAuthorize("hasRole('ROLE_MANAGER')") // Gestion des affectations livreurs
     public ResponseEntity<ColisDto> assignerLivreur(
             @PathVariable String colisId,
             @RequestParam String livreurId) {
-
         ColisDto updatedColis = colisService.assignerLivreur(colisId, livreurId);
         return ResponseEntity.ok(updatedColis);
     }
 
-    // PUT /api/colis/statut/{colisId} (User Story Livreur)
-    @Operation(summary = "Met à jour le statut du colis (COLLECTE, LIVRE, etc.)")
-    @ApiResponse(responseCode = "200", description = "Statut mis à jour et historique enregistré")
+    // ============================================
+    // 3. ESPACE LIVREUR (ROLE_DELIVERYMAN)
+    // ============================================
+
+    @Operation(summary = "Met à jour le statut du colis (Réservé au Livreur)")
     @PutMapping("/statut/{colisId}")
-    // CORRECTION : colisId doit être String, et le statut doit prendre la valeur du paramètre
+    @PreAuthorize("hasRole('ROLE_DELIVERYMAN')") // Le livreur ne peut que modifier le statut
     public ResponseEntity<ColisDto> updateStatut(
             @PathVariable String colisId,
             @RequestParam StatutColis statut,
             @RequestParam String commentaire) {
-
         ColisDto updatedColis = colisService.updateStatut(colisId, statut, commentaire);
         return ResponseEntity.ok(updatedColis);
+    }
+
+    // ============================================
+    // 4. ACCÈS COMMUN (Suivi de colis)
+    // ============================================
+
+    @Operation(summary = "Récupère un colis par son ID (Suivi)")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_CLIENT', 'ROLE_DELIVERYMAN')") // Tout le monde peut suivre
+    public ResponseEntity<ColisDto> getColisById(@PathVariable String id) {
+        return ResponseEntity.ok(colisService.getColisById(id));
     }
 }
