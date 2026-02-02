@@ -64,9 +64,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        // Routes publiques
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
                         .requestMatchers(HttpMethod.POST, "/api/clients-expediteurs").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/colis/**").permitAll()
 
                         // Tout le reste protégé par JWT
                         .anyRequest().authenticated()
