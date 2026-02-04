@@ -39,6 +39,16 @@ public class Livreur {
     @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;
 
+    // 🔐 Champs sécurité
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String role = "ROLE_DELIVERYMAN";
+
     // Relation: Un livreur peut être assigné à plusieurs colis.
     @OneToMany(mappedBy = "livreur")
     private List<Colis> colisAssignes;
