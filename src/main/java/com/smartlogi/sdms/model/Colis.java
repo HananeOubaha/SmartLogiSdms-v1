@@ -1,5 +1,6 @@
 package com.smartlogi.sdms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.smartlogi.sdms.enums.PrioriteColis;
 import com.smartlogi.sdms.enums.StatutColis;
 import jakarta.persistence.*;
@@ -49,6 +50,7 @@ public class Colis {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_expediteur_id", nullable = false)
+    @JsonIgnoreProperties({"colis", "password", "roles", "authorities"})
     private ClientExpéditeur clientExpediteur;
 
     @ManyToOne(fetch = FetchType.LAZY)
