@@ -3,40 +3,54 @@ package com.smartlogi.sdms.mapper;
 import com.smartlogi.sdms.DTO.ColisCreationDto;
 import com.smartlogi.sdms.DTO.ColisDto;
 import com.smartlogi.sdms.model.Colis;
-import org.mapstruct.MappingTarget;// Import nécessaire pour l'association
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ColisMapper {
 
-    // Conversion DTO de Création vers Entité
-    @Mapping(target = "id", ignore = true) // L'ID est généré par Hibernate
-    @Mapping(target = "livreur", ignore = true) // Le livreur est assigné via le service
-    @Mapping(target = "statut", ignore = true) // Le statut est initialisé dans @PrePersist de l'Entité
-    @Mapping(target = "historique", ignore = true) // L'historique est géré par le service
-    @Mapping(target = "produits", ignore = true) // Les produits ne sont pas gérés ici
-    // Mapping des IDs UUID vers les entités
+    // ==========================================================
+    // 1. Conversion DTO Création -> Entité
+    // ==========================================================
+    @Mapping(target = "id", ignore = true) // Généré par la base
+    @Mapping(target = "livreur", ignore = true) // Assigné plus tard
+    @Mapping(target = "statut", ignore = true) // Initialisé par défaut
+    @Mapping(target = "historique", ignore = true) // Géré par service
+    @Mapping(target = "produits", ignore = true)
+    // Mapping des IDs vers les objets liés
     @Mapping(source = "clientExpediteurId", target = "clientExpediteur.id")
     @Mapping(source = "destinataireId", target = "destinataire.id")
     @Mapping(source = "zoneId", target = "zone.id")
     Colis toEntity(ColisCreationDto dto);
 
 
-    // Conversion Entité vers DTO de Réponse
-    @Mapping(source = "clientExpediteur.nom", target = "clientExpediteurNomComplet") // Exemple de mapping de nom
-    @Mapping(source = "zone.nom", target = "zoneNom")
-    @Mapping(expression = "java(colis.getLivreur() != null ? colis.getLivreur().getId() : null)", target = "livreurId")
+    // ==========================================================
+    // 2. Conversion Entité -> DTO Réponse (LE FIX EST ICI)
+    // ==========================================================
+
+    //  Correction: On utilise \" au lieu de ' pour les Strings Java
+    @Mapping(target = "clientExpediteurNomComplet",
+            expression = "java(colis.getClientExpediteur() != null ? colis.getClientExpediteur().getNom() + \" \" + colis.getClientExpediteur().getPrenom() : \"Inconnu\")")
+
+    //  Correction: \"Non définie\" au lieu de 'Non définie'
+    @Mapping(target = "zoneNom",
+            expression = "java(colis.getZone() != null ? colis.getZone().getNom() : \"Non définie\")")
+
+    @Mapping(target = "livreurId",
+            expression = "java(colis.getLivreur() != null ? colis.getLivreur().getId() : null)")
+
     @Mapping(source = "statut", target = "statut")
     @Mapping(source = "priorite", target = "priorite")
     ColisDto toDto(Colis colis);
 
     List<ColisDto> toDto(List<Colis> colis);
 
-    // Mappeur inverse pour les futures mises à jour
+    // ==========================================================
+    // 3. Mise à jour Entité depuis DTO
+    // ==========================================================
     @Mapping(target = "clientExpediteur", ignore = true)
     @Mapping(target = "destinataire", ignore = true)
     @Mapping(target = "zone", ignore = true)
