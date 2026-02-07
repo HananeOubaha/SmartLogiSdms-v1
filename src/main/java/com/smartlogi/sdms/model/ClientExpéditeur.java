@@ -1,5 +1,6 @@
 package com.smartlogi.sdms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +46,7 @@ public class ClientExpéditeur {
     private LocalDateTime dateCreation;
 
     @OneToMany(mappedBy = "clientExpediteur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Colis> colisEnvoyes;
 
     @PrePersist
