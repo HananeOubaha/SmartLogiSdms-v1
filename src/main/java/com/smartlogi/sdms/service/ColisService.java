@@ -23,19 +23,18 @@ public class ColisService {
     private final ColisMapper colisMapper;
     private final HistoriqueLivraisonRepository historiqueRepository;
 
-    // Injection des services des entités liées pour la validation
     private final ClientExpéditeurService clientExpéditeurService;
     private final DestinataireService destinataireService;
     private final ZoneService zoneService;
     private final LivreurService livreurService;
 
-    // --- Méthode de Traçabilité ---
+    // ... (Méthodes privées d'historique inchangées) ...
     private void enregistrerHistorique(Colis colis, String commentaire) {
         enregistrerHistorique(colis, null, colis.getStatut(), commentaire);
     }
 
     private void enregistrerHistorique(Colis colis, StatutColis statutPrecedent, StatutColis statutActuel,
-            String commentaire) {
+                                       String commentaire) {
         HistoriqueLivraison historique = new HistoriqueLivraison();
         historique.setColis(colis);
         historique.setStatutPrecedent(statutPrecedent != null ? statutPrecedent.name() : null);
@@ -47,29 +46,20 @@ public class ColisService {
     }
 
     // ============================================
-    // 1. CRÉATION (Le début du flux)
+    // 1. CRÉATION
     // ============================================
-
     @Transactional
     public ColisDto createColis(ColisCreationDto creationDto) {
-
-        // 1. Validation de l'existence des IDs String (vérifie les FKs)
         ClientExpéditeur client = clientExpéditeurService.getClientEntityById(creationDto.getClientExpediteurId());
         Destinataire destinataire = destinataireService.getDestinataireEntityById(creationDto.getDestinataireId());
         Zone zone = zoneService.getZoneEntityById(creationDto.getZoneId());
 
-        // 2. Création de l'Entité Colis et mapping
         Colis colis = colisMapper.toEntity(creationDto);
-
-        // Assigner les entités résolues
         colis.setClientExpediteur(client);
         colis.setDestinataire(destinataire);
         colis.setZone(zone);
 
-        // Statut initialisé à CRÉÉ dans @PrePersist
         Colis savedColis = colisRepository.save(colis);
-
-        // 3. Enregistrement de la première étape de l'historique
         enregistrerHistorique(savedColis, "Colis créé par le client expéditeur.");
 
         return colisMapper.toDto(savedColis);
@@ -85,64 +75,45 @@ public class ColisService {
         return colisMapper.toDto(colis);
     }
 
+    @Transactional(readOnly = true)
     public List<ColisDto> getAllColis() {
         return colisMapper.toDto(colisRepository.findAll());
     }
 
+    // 👇 CORRECTION ICI : Changement de Long à String pour correspondre à l'erreur 👇
+    @Transactional(readOnly = true)
+    public List<ColisDto> getColisByClientId(String clientId) {
+        // Le repository doit aussi avoir la signature findByClientExpediteur_Id(String id)
+        return colisMapper.toDto(colisRepository.findByClientExpediteur_Id(clientId));
+    }
+
     // ============================================
-    // 3. MISE À JOUR DU STATUT (Workflow)
+    // 3. MISE À JOUR & 4. AFFECTATION & 5. DELETE
     // ============================================
 
     @Transactional
     public ColisDto updateStatut(String colisId, StatutColis nouveauStatut, String commentaire) {
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
-
+                .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé"));
         StatutColis ancienStatut = colis.getStatut();
         colis.setStatut(nouveauStatut);
-
         Colis updatedColis = colisRepository.save(colis);
-
-        // Enregistrement de la nouvelle étape de l'historique avec statut précédent
         enregistrerHistorique(updatedColis, ancienStatut, nouveauStatut, commentaire);
-
-        // Logique spécifique au workflow:
-        if (nouveauStatut == StatutColis.COLLECTE) {
-            // Mettre en place d'autres actions automatiques, si nécessaire.
-        }
-
         return colisMapper.toDto(updatedColis);
     }
-
-    // ============================================
-    // 4. AFFECTION AU LIVREUR (Planification)
-    // ============================================
 
     @Transactional
     public ColisDto assignerLivreur(String colisId, String livreurId) {
         Colis colis = colisRepository.findById(colisId)
-                .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé avec l'ID: " + colisId));
-
-        Livreur livreur = livreurService.getLivreurEntityById(livreurId); // Validation de l'existence
-
+                .orElseThrow(() -> new EntityNotFoundException("Colis non trouvé"));
+        Livreur livreur = livreurService.getLivreurEntityById(livreurId);
         colis.setLivreur(livreur);
-
-        // Changement de statut automatique: EN_TRANSIT
         StatutColis ancienStatut = colis.getStatut();
         colis.setStatut(StatutColis.EN_TRANSIT);
-
         Colis updatedColis = colisRepository.save(colis);
-
-        // Enregistrement de l'historique de l'affectation avec statut précédent
-        enregistrerHistorique(updatedColis, ancienStatut, StatutColis.EN_TRANSIT,
-                "Colis affecté au livreur: " + livreur.getNom() + " " + livreur.getPrenom() + ".");
-
+        enregistrerHistorique(updatedColis, ancienStatut, StatutColis.EN_TRANSIT, "Affecté au livreur: " + livreur.getNom());
         return colisMapper.toDto(updatedColis);
     }
-
-    // ============================================
-    // 5. SUPPRESSION (DELETE)
-    // ============================================
 
     @Transactional
     public void deleteColis(String id) {
